@@ -1,0 +1,177 @@
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, SafeAreaView, TouchableOpacity,View,Image,ScrollView } from 'react-native';
+import { COLORS, ROUTES, IMGS } from '../../constants';
+import { PropertyId } from '../../../store';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+const Tasks = ({ navigation }) => {
+
+  const { propertyId } = PropertyId.useState((s) => s);
+  console.log(propertyId)
+  const [propertyImage, setpropertyImage] = React.useState('')
+  const [propertyID, setpropertyID] = React.useState('')
+  const [propertySize, setpropertySize] = React.useState('')
+  const [propertyDes, setpropertyDes] = React.useState('')
+  const [propertyOwnerName, setpropertyOwnerName] = React.useState('')
+  const [propertyAddress, setpropertyAddress] = React.useState('')
+
+
+  const [propertiesData, setpropertiesData] = React.useState([
+    {
+      'PropertyImage': IMGS.PROPRTY1,
+      'PropertyId': 1,
+      'Verified': 'yes',
+      'OwnerImgae': 'profile',
+      'OwnerName': 'Rajiv',
+      'PropertyLocation': 'Hyderabad, Telangana',
+      'PropertySize': ' 155 Acres ',
+      'PropertyDescription': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis aLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis aLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis aLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis aLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis aLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis aLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis aLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis a',
+      'PropertyAddress': 'Agiryala, Kondurg, Shadnager, Rangareddy, Telagana',
+      'PropertyContact': '+919876543210',
+      'Services': ['Watchman Service', 'EC', 'Cleaning Service']
+    },
+    {
+      'PropertyImage': IMGS.PROPRTY1,
+      'PropertyId': 2,
+      'Verified': 'yes',
+      'OwnerImgae': 'profile',
+      'OwnerName': 'Shiva',
+      'PropertyLocation': 'Hyderabad, Telangana',
+      'PropertySize': '43 Acres',
+      'PropertyDescription': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis a',
+      'PropertyAddress': 'Peddaipally, Balanagar, Mahabubnagar, Telangana',
+      'PropertyContact': '+919876543210',
+      'Services': ['Watchman Service', 'EC', 'Cleaning Service']
+    },
+    {
+      'PropertyImage': IMGS.PROPRTY1,
+      'PropertyId': 3,
+      'Verified': 'yes',
+      'OwnerImgae': 'profile',
+      'OwnerName': 'Rajiv',
+      'PropertyLocation': 'Hyderabad, Telangana',
+      'PropertySize': '4000sq.ft',
+      'PropertyDescription': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis a',
+      'PropertyAddress': 'Plot no 497, 100 Feet Rd, Ayyappa Society,Chanda Naik Nagar, Madhapur, Hyderabad Telangana 500081',
+      'PropertyContact': '+919876543210',
+      'Services': ['Watchman Service', 'EC', 'Cleaning Service']
+    },
+    {
+      'PropertyImage': IMGS.PROPRTY1,
+      'PropertyId': 4,
+      'Verified': 'yes',
+      'OwnerImgae': 'profile',
+      'OwnerName': 'Rajiv',
+      'PropertyLocation': 'Hyderabad, Telangana',
+      'PropertySize': '4000sq.ft',
+      'PropertyDescription': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis a',
+      'PropertyAddress': 'Plot no 497, 100 Feet Rd, Ayyappa Society,Chanda Naik Nagar, Madhapur, Hyderabad Telangana 500081',
+      'PropertyContact': '+919876543210',
+      'Services': ['Watchman Service', 'EC', 'Cleaning Service']
+    },
+    {
+      'PropertyImage': IMGS.PROPRTY1,
+      'PropertyId': 5,
+      'Verified': 'false',
+      'OwnerImgae': 'profile',
+      'OwnerName': 'Rajiv',
+      'PropertyLocation': 'Hyderabad, Telangana',
+      'PropertySize': '4000sq.ft',
+      'PropertyDescription': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis a',
+      'PropertyAddress': 'Plot no 497, 100 Feet Rd, Ayyappa Society,Chanda Naik Nagar, Madhapur, Hyderabad Telangana 500081',
+      'PropertyContact': '+919876543210',
+      'Services': ['Watchman Service', 'EC', 'Cleaning Service']
+    },
+    {
+      'PropertyImage': IMGS.PROPRTY1,
+      'PropertyId': 6,
+      'Verified': 'yes',
+      'OwnerImgae': 'profile',
+      'OwnerName': 'Rajiv',
+      'PropertyLocation': 'Hyderabad, Telangana',
+      'PropertySize': '4000sq.ft',
+      'PropertyDescription': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit metus nec libero tristique, ac commodo tortor molestie. Fusce interdum fringilla ante, id varius ipsum tristique ut. Nullam id mi sit amet purus scelerisque consequat vel vel ipsum. Vivamus ut semper est. Aliquam maximus eleifend nulla, id sollicitudin neque vehicula a. Morbi efficitur fermentum felis, in tincidunt nisi convallis a',
+      'PropertyAddress': 'Plot no 497, 100 Feet Rd, Ayyappa Society,Chanda Naik Nagar, Madhapur, Hyderabad Telangana 500081',
+      'PropertyContact': '+919876543210',
+      'Services': ['Watchman Service', 'EC', 'Cleaning Service']
+    }
+  ]);
+
+ 
+  useEffect(() => {
+        for(let i = 0;i<propertiesData.length; i++){
+    if (propertiesData[i].PropertyId === propertyId) {
+     
+      setpropertyImage(propertiesData[i].PropertyImage)
+      setpropertyID(propertiesData[i].PropertyID)
+      setpropertySize(propertiesData[i].PropertySize)
+      setpropertyDes(propertiesData[i].PropertyDescription)
+      setpropertyOwnerName(propertiesData[i].OwnerName)
+      setpropertyAddress(propertiesData[i].PropertyAddress)
+    }
+  }
+        
+        },[1])
+return (
+ <ScrollView style={styles.maincontainer}>
+ <View style={{display:'flex',flexDirection:'row',alignItems:'center',marginBottom:20}}>
+ <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
+<Text style={{fontSize:24,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:'100%',fontWeight:'bold'}}>
+ Property Details
+</Text>
+ </View>
+ <View>
+<Image   style={styles.propertyImg}
+          source={propertyImage}
+        />
+ </View>
+
+ <View style={{...styles.flexStyle, paddingTop:20}}>
+<Text style={{fontSize:20,fontWeight:'bold'}}>
+{propertyId}
+</Text>
+<Text style={{fontSize:18,fontWeight:'bold'}}>
+{propertySize}
+</Text>
+</View>
+<ScrollView style={{height:300}}>
+<Text style={{textAlign:'justify',marginTop:10}}>
+{propertyDes}
+</Text>
+</ScrollView>
+<Text style={{fontSize:22,marginVertical:10}}>
+Contact Details
+</Text>
+<Text style={{fontSize:18}}>
+{propertyOwnerName}
+</Text>
+<Text>
+{propertyAddress}
+</Text>
+ </ScrollView>
+);
+};
+
+export default Tasks;
+
+const styles = StyleSheet.create({
+  maincontainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    height: '90%',
+    width:'100%',
+    paddingBottom:80
+  },
+  flexStyle:{
+    display:'flex',
+    justifyContent:'space-between',
+    flexDirection:'row',
+    alignItems:'center',
+    width:'100%'
+  },
+  propertyImg:{
+    width:'100%',
+    height:100,
+    borderRadius:5,
+    
+  }
+});
