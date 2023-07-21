@@ -222,7 +222,7 @@ if(Arrayposition.length != 0){
         setLoading(false)
         console.log(response);
         
-        navigation.navigate(ROUTES.TASKS_DETAIL);
+        navigation.goBack()
       } catch (error) {
         console.log(error);
       }

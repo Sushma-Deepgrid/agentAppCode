@@ -7,6 +7,7 @@ import FontIcon from 'react-native-vector-icons/FontAwesome';
 import CustomDrawer from '../components/CustomDrawer';
 import { Image, Text, TouchableOpacity,View,Platform} from 'react-native';
 import TasksNavigator from './TasksNavigator';
+import HomeNavigator from './HomeNavigator';
 import ProfileNavigator from './ProfileNavigator';
 import Icon from 'react-native-vector-icons/Ionicons';
 import IconFontAwesome5 from 'react-native-vector-icons/FontAwesome5';

@@ -101,7 +101,25 @@ const Home = ({navigation}) => {
           <ScrollView style={{height:'98%'}}>
             {
               tasksData.map((data, index) => (
-                <TouchableOpacity key={index} >
+                <TouchableOpacity key={index} onPress={() => { 
+                  if(data.service_name === 'Geofencing'){
+              navigation.navigate(ROUTES.GEOFENCING)
+              ServiceName.update((s) => {
+                s.serviceName = data.service_name;
+              })
+              ServiceId.update((s) => {
+                s.serviceId = data.service_id;
+              })}
+            else{
+              navigation.navigate(ROUTES.ECSERVICE)
+              ServiceName.update((s) => {
+                s.serviceName = data.service_name;
+              })
+              ServiceId.update((s) => {
+                s.serviceId = data.service_id;
+              })
+            }
+                } } >
                   <View style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10 }}>
                     <View>
                       <Text style={{ marginRight: 10 }}>

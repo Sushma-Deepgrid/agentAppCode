@@ -12,6 +12,7 @@ import { Home, Tasks, Notifications, Settings } from '../screens';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ProfileNavigator from './ProfileNavigator';
 import TasksNavigator from './TasksNavigator';
+import HomeNavigator from './HomeNavigator';
 import DashboardNavigator from './DashboardNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Text } from 'react-native';
@@ -33,7 +34,7 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color, size, focused }) => {
             let iconName;
 
-            if (route.name === ROUTES.HOME_TAB) {
+            if (route.name === ROUTES.HOME_NAVIGATOR) {
               iconName = focused ? 'home' : 'home';
             } else if (route.name === ROUTES.PROFILE_NAVIGATOR) {
               iconName = focused ? 'user-circle' : 'user-circle';
@@ -49,8 +50,8 @@ function BottomTabNavigator() {
           },
         })}>
         <Tab.Screen
-          name={ROUTES.HOME_TAB}
-          component={Home}
+          name={ROUTES.HOME_NAVIGATOR}
+          component={HomeNavigator}
           options={{
             
             title: 'Home',

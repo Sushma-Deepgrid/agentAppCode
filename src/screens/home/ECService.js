@@ -481,7 +481,7 @@ const { commentBox } = CommentBox.useState((s) => s);
       s.previousGeoTaggingList = [];
     });
     
-      navigation.navigate(ROUTES.TASKS_DETAIL);
+    navigation.goBack();
     } catch (error) {
       console.log(error);
     }
