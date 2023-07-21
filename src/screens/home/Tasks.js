@@ -42,7 +42,7 @@ const Tasks = ({navigation}) => {
             ...propertyObject
           };
         });
-      console.warn(uniquePropertyObjects.length)
+      // console.warn(uniquePropertyObjects.length)
         setItems(uniquePropertyObjects)
       } catch (error) {
         await  console.warn(error);

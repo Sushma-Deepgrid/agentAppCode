@@ -5,7 +5,7 @@ export default {
   HOME: 'Home',
   HOME_TAB: 'Home Tab',
   HOME_DRAWER: 'Home Drawer',
-
+  HOME_NAVIGATOR:'Home Navigator',
   TASKS: 'Tasks',
   TASKS_NAVIGATOR: 'Tasks Navigator',
   TASKS_DRAWER: 'Tasks Drawer',
@@ -26,5 +26,8 @@ export default {
 
   PROPERTYVISIT: 'Property Visit',
   GEOFENCING:'Geofencing',
-  ECSERVICE:'EC Service'
+  ECSERVICE:'EC Service',
+  IMAGES:'Images',
+  DOCUMENTS:'Documents',
+  ENTERLOCATION:'Enter Location'
 };

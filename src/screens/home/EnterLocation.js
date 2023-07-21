@@ -1,69 +1,30 @@
 import React,{useState,useEffect} from 'react';
 import { StyleSheet, Text, View, Button, TextInput, TouchableOpacity,ActivityIndicator } from "react-native"
 import * as Location from 'expo-location';
-import SelectDropdown from 'react-native-select-dropdown';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import { COLORS, ROUTES, IMGS } from '../../constants';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PropertyId, ServiceName, ServiceId, UserToken, DataTable } from '../../../store';
 
-export default function GeoFencing({navigation}) {
-  const [initialRegion, setInitialRegion] = useState(null);
+export default function EnterLocation({navigation}) {
+ 
 
     const { serviceName } = ServiceName.useState((s) => s);
     const { serviceId } = ServiceId.useState((s) => s);
     // console.warn(serviceId)
     const { userToken } = UserToken.useState((s) => s);
     const [mapRegion, setMapRegion] = useState()
-   const [Arrayposition, setArrayposition] = useState(null)
+   const [Arrayposition, setArrayposition] = useState([])
      const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
     const [PolygonCoordsArray, setPolygonCoordsArray] = useState(null);
     const [Loader, setLoader] = useState(false);
     const [loading, setLoading] = useState(false);
-    const Status = ["Completed", "Pending", "Ongoing"]
-  const [selectedStatus, setSelectedStatus] = useState('');
-    useEffect(() => {
-  
-      async function fetchTrackApiData() {
-  
-        // console.warn(`Bearer ${userToken}`)
-        try {
-          const response = await axios.get(
-            `https://aagama2.adgrid.in/user/get-task/${serviceId}`,
-            {
-              headers: {
-                'Authorization': 'Bearer ' + userToken
-              }
-            }
-          );
-
-          setSelectedStatus(response.data.task.status);
-      setArrayposition(response.data.task.geo_fencing)
-      setPolygonCoordsArray(response.data.task.geo_fencing)
-      console.warn(response.data.task.geo_fencing)
-        if(response.data.task.geo_fencing != null){
-
-          const latitude=response.data.task.geo_fencing[0].latitude
-          const longitude=response.data.task.geo_fencing[0].longitude
-  
-          setInitialRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.0005,
-            longitudeDelta: 0.0005,
-          });
-        }
-         
-        } catch (error) {
-          await console.log(error);
-          // window.alert("Can't Assign Same Track Name")
-        }
-      }
-      fetchTrackApiData();
-    }, [1]);
-
+    const [latitudeValue, setLatitudeValue] = useState('');
+    const [longitudeValue, setLongitudeValue] = useState('');
+    
+    
   const getLocation = async () => {
    
     
@@ -171,28 +132,41 @@ else{
   };
   
   
-  
+  useEffect(() => {
+    
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+       console.log(status)
+      if (status !== 'granted') {
+        // Handle permission denied
+        return;
+      }
+     else{
+       
+      let { coords } = await Location.getCurrentPositionAsync({});
+      setLocation(coords);
+      console.log(coords)
+      
+     }
+    })();
+  }, []);
   
   async function doneFencing(e) {
-    // setLoading(true)
+    setLoading(true)
       e.preventDefault();
       setPolygonCoordsArray(Arrayposition)
      
     
       console.log(Arrayposition,serviceId)
       const finalGeofencedObj=[]
-      if(Arrayposition != null){
-if(Arrayposition.length != 0){
-  for(let i=0;i<Arrayposition.length;i++){
-    finalGeofencedObj.push({
-      "latitude":Arrayposition[i].latitude,
-      "longitude":Arrayposition[i].longitude
-    })
-  }
-}
+      for(let i=0;i<Arrayposition.length;i++){
+        finalGeofencedObj.push({
+          "latitude":Number(Arrayposition[i].latitude),
+          "longitude":Number(Arrayposition[i].longitude)
+        })
       }
-      console.log(finalGeofencedObj);
- 
+      console.log(finalGeofencedObj)
+  
       const formData = new FormData();
       formData.append("status", "Completed");
       if(Arrayposition != null){
@@ -202,12 +176,10 @@ if(Arrayposition.length != 0){
       else{
         formData.append("geo_fencing", []);
       }}
-     
       formData.append("geo_tagging", []);
       formData.append("images", []);
       formData.append("documents", []);
-
-     console.log(formData)
+  
       try {
         const response = await axios.put(
           `https://aagama2.adgrid.in/user/edit-task/${serviceId}`,
@@ -230,20 +202,28 @@ if(Arrayposition.length != 0){
      
       // navigation.navigate(ROUTES.TASKS_DETAIL);
     }
-    const handleStatusChange = (index) => {
-      if (index !== 0) {
-        setSelectedStatus(index);
-        console.log(index)
+    const handleSearch = async () => {
+      if(longitudeValue != '' && latitudeValue != ''){
+        const objLocation=[...Arrayposition]
+
+        objLocation.push({
+          latitude:latitudeValue,
+          longitude:longitudeValue
+        })
+
+        setArrayposition(objLocation)
       }
-    };
+        else{
+          alert("Fill Both Latitude and Longitude Values")
+        }
+      }; 
 
-
-    function DeletePointFun(index){
-console.log(index)
-const objDel=[...Arrayposition]
-objDel.splice(index,1)
-setArrayposition(objDel)
-    }
+      function DeletePointFun(index){
+        console.log(index)
+        const objDel=[...Arrayposition]
+        objDel.splice(index,1)
+        setArrayposition(objDel)
+            }
     return (
       <>
        { (loading === true || loading === 'true') ?
@@ -251,7 +231,7 @@ setArrayposition(objDel)
         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
               <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
               <Text style={{ fontSize: 24, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', fontWeight: 'bold', marginLeft: 10 }}>
-              {serviceName}
+              Back
               </Text>
             </View>
        <View style={styles.loaderContainer}>
@@ -261,129 +241,78 @@ setArrayposition(objDel)
             </>
             :
       <View style={styles.container}>
-       
+        <View>
+                
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 10,justifyContent:'space-between' }}>
                   <View style={{ display: 'flex', flexDirection: 'row',alignItems: 'center'}}>
-
                   <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
                   <Text style={{ fontSize: 24, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',  fontWeight: 'bold' }}>
-                    {serviceName}
+                    Back
                   </Text>
                   </View>
                   <View >
-                <SelectDropdown
-                  data={Status}
-                  defaultButtonText="Select Status"
-                  buttonStyle={{ width: 150, backgroundColor: COLORS.primary, borderRadius: 10,height:35 }}
-                  buttonTextStyle={{ color: 'white' }}
-                  defaultValue={selectedStatus}
-                  onSelect={(index) => handleStatusChange(index)}
-                  buttonTextAfterSelection={(selectedItem) => selectedItem}
-                  rowTextForSelection={(item) => item}
-                  disabledItemIndices={[0]}
-                />
+                  <TouchableOpacity onPress={doneFencing} style={{ backgroundColor:`${COLORS.primary}`,borderRadius:5,padding:5,marginRight:10 }} >
+           
+           <Text style={{color:'white',textAlign:'center'}}>
+           Done
+           </Text>
+           </TouchableOpacity>
               </View>
       
       
                 </View>
       
       
-             
-       <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingHorizontal:5,marginBottom:10,marginTop:10}}>
-       {
-         Loader === false ?
-  
-  <TouchableOpacity onPress={getLocation} style={{backgroundColor:`${COLORS.primary}`,padding:5,borderRadius:5}}>
-  <Text style={{color:'white'}}>
-  Capture Location
-  </Text>
-  </TouchableOpacity>
-  :
-  <TouchableOpacity  style={{backgroundColor:`${COLORS.primary}`,padding:5,borderRadius:5}}>
-  <Text style={{color:'white'}}>
-  Loading...
-  </Text>
-  </TouchableOpacity>
-  
-       }
-       
-  <TouchableOpacity onPress={()=>{ navigation.navigate(ROUTES.ENTERLOCATION);}}  style={{backgroundColor:`${COLORS.primary}`,padding:5,borderRadius:5}}>
-  <Text style={{color:'white'}}>
-  Enter Location
-  </Text>
-  </TouchableOpacity>
-       
-        </View>
+              </View>
+
+              <View style={styles.searchContainer}>
+                <View>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Enter latitude value"
+              value={latitudeValue}
+              onChangeText={setLatitudeValue}
+               placeholderTextColor={COLORS.primary}
+            />
+
+<TextInput
+              style={{...styles.searchInput,marginTop:10}}
+              placeholder="Enter Longitude value"
+              value={longitudeValue}
+              onChangeText={setLongitudeValue}
+               placeholderTextColor={COLORS.primary}
+            />
+
+            </View>
+            <TouchableOpacity style={{ backgroundColor:`${COLORS.primary}`,borderRadius:5,padding:5,marginRight:10 }} 
+            onPress={handleSearch}>
+             <Text style={{color:'white',textAlign:'center'}}> Go </Text>
+            </TouchableOpacity>
+
+          </View>
       
          <View style={{paddingHorizontal:5}}>
          {
-          Arrayposition != null &&
+          Arrayposition.length != 0 &&
   <>
    {Arrayposition.map((marker, index) => (
-                <View key={index} style={{flexDirection:'row',alignItems:'center'}}>
-                <Text>
-                  Point-{`${index+1}`} : {marker.latitude},{marker.longitude}
-                </Text>
-                <Ionicons name="trash" color="red" size={24} onPress={() => DeletePointFun(index)} />
-
-                    
-                </View>
+                 <View key={index} style={{flexDirection:'row',alignItems:'center'}}>
+                 <Text>
+                   Point-{`${index+1}`} : {marker.latitude},{marker.longitude}
+                 </Text>
+                 <Ionicons name="trash" color="red" size={24} onPress={() => DeletePointFun(index)} />
+ 
+                     
+                 </View>
               ))}
   </>
   
          }
         
        </View>
-       {
-          Arrayposition != null &&
-          <>
-        <MapView style={styles.map}  initialRegion={initialRegion} >
-          
-        {
-          Arrayposition != null &&
-  <> 
-  {Arrayposition.map((marker, index) => (
-               <Marker
-                 key={index}
-                 coordinate={{
-                   latitude: marker.latitude,
-                   longitude: marker.longitude,
-                 }}
-                 title={`Marker ${index + 1}`}
-               />
-             ))}
-             </>
-  }
-    
-              {
-                PolygonCoordsArray != null &&
-              <Polygon
-            coordinates={PolygonCoordsArray.map((marker) => ({
-              latitude: marker.latitude,
-              longitude: marker.longitude,
-            }))}
-            fillColor="red"
-            strokeColor="red"
-            
-          />
-              }
-        </MapView>
-        <View style={{ flexDirection: 'row', display: 'flex', justifyContent: 'flex-end'}}>
-          <View></View>
-<TouchableOpacity onPress={doneFencing} style={{ backgroundColor:`${COLORS.primary}`,borderRadius:5,marginBottom:80,padding:10,marginTop:10,marginRight:10 }} >
-           
-          <Text style={{color:'white',textAlign:'center'}}>
-          Done
-          </Text>
-          </TouchableOpacity>
-          
-        </View>
-          </>
-  }
- 
+       
       </View>
   }
- 
       </>
     );
   
@@ -413,8 +342,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   searchInput: {
-    flex: 1,
-    height: 40,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#ccc',

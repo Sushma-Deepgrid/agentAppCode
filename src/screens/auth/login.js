@@ -77,7 +77,7 @@ const Login = ({navigation}) => {
     .catch((error) => {
       
                     console.log(error);
-                    alert("Incorrecttt Email or Password")
+                    alert("Incorrect Email or Password")
     });
     }
     else{

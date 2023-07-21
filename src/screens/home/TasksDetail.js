@@ -82,7 +82,7 @@ const finalobj={
   'status':statusObj
 }
 
-console.warn(finalobj.property.images[0])
+// console.warn(finalobj.property.images[0])
 setpropertiesData(finalobj)
 setpropertyImage(`https://aagama2.adgrid.in/${finalobj.property.images[0]}`)
 setpropertyID(finalobj.property.propert_name)
@@ -97,7 +97,7 @@ for(let k=0;k<finalobj.services.length;k++){
     serviceFinalObj.push({heading: "", title: finalobj.services[k], description: "",path: '',id:finalobj.tasks[k],status:finalobj.status[k]})
   
 }
- console.warn(serviceFinalObj)
+//  console.warn(serviceFinalObj)
 
 setstepsDetail(serviceFinalObj)
 
@@ -181,7 +181,13 @@ const Step = ({ status, heading, title, description,id }) => {
       if(title === 'Property Visit'){
 navigation.navigate(ROUTES.PROPERTYVISIT)}
 else  if(title === 'Geofencing'){
-  navigation.navigate(ROUTES.GEOFENCING)}
+  navigation.navigate(ROUTES.GEOFENCING)
+  ServiceName.update((s) => {
+    s.serviceName = title;
+  })
+  ServiceId.update((s) => {
+    s.serviceId = id;
+  })}
 else{
   navigation.navigate(ROUTES.ECSERVICE)
   ServiceName.update((s) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {Tasks, TasksDetail,PropertyVisit, GeoFencing,ECService} from '../screens';
+import {Tasks, TasksDetail,PropertyVisit, GeoFencing,ECService,Images,Documents,EnterLocation} from '../screens';
 import {ROUTES} from '../constants';
 
 const Stack = createStackNavigator();
@@ -18,6 +18,9 @@ function TasksNavigator() {
        <Stack.Screen name={ROUTES.PROPERTYVISIT} component={PropertyVisit} />
         <Stack.Screen name={ROUTES.ECSERVICE} component={ECService} />
        <Stack.Screen name={ROUTES.GEOFENCING} component={GeoFencing} />
+       <Stack.Screen name={ROUTES.IMAGES} component={Images} />
+       <Stack.Screen name={ROUTES.DOCUMENTS} component={Documents} />
+       <Stack.Screen name={ROUTES.ENTERLOCATION} component={EnterLocation} />
        
     </Stack.Navigator>
   );

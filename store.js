@@ -10,8 +10,30 @@ export const PropertyId = new Store({
   propertyId: '',
 });
 
+
+export const DocumentsList = new Store({
+  documentsList: [],
+});
+
+export const ImagesList = new Store({
+  imagesList: [],
+});
+export const GeoTaggingList = new Store({
+  geoTaggingList: [],
+});
+
+export const PreviousImagesList = new Store({
+  previousImagesList: [],
+});
+export const PreviousGeoTaggingList = new Store({
+  previousGeoTaggingList: [],
+});
+
 export const Geofencing = new Store({
   geofencing: [],
+});
+export const CommentBox = new Store({
+  commentBox: '',
 });
 export const UserToken = new Store({
   userToken: '',
@@ -40,7 +62,9 @@ export const ServiceName = new Store({
 export const ServiceId = new Store({
   serviceId: '',
 });
-registerInDevtools({AuthStore,PropertyId,Geofencing,UserId,UserToken,UserMobile,ServiceName,ServiceId,UserLastName,UserFirstName});
+registerInDevtools({AuthStore,PropertyId,Geofencing,UserId,UserToken,
+  UserMobile,ServiceName,ServiceId,UserLastName,UserFirstName,CommentBox,
+  DocumentsList,ImagesList,GeoTaggingList,PreviousGeoTaggingList,PreviousImagesList});
 
 
 

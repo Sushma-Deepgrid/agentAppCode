@@ -12,6 +12,7 @@ import { Home, Tasks, Notifications, Settings } from '../screens';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ProfileNavigator from './ProfileNavigator';
 import TasksNavigator from './TasksNavigator';
+import DashboardNavigator from './DashboardNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Text } from 'react-native';
 import IconFontAwesome5 from 'react-native-vector-icons/FontAwesome5';

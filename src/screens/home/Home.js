@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import React,{useEffect,useState} from 'react';
-import { COLORS } from '../../constants';
+import { COLORS,ROUTES } from '../../constants';
 import { VictoryPie } from "victory-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
-import { UserToken } from '../../../store';
-const Home = () => {
+import { UserToken,PropertyId,ServiceName,ServiceId } from '../../../store';
+const Home = ({navigation}) => {
   const { userToken } = UserToken.useState((s) => s);
   console.log(userToken);
   useEffect(() => {
@@ -21,7 +21,7 @@ const Home = () => {
         );
 
         await  console.log(response.data.tasks);
-        console.warn(response.data.tasks);
+        // console.warn(response.data.tasks);
        settasksData(response.data.tasks)
         
       } catch (error) {
@@ -101,7 +101,7 @@ const Home = () => {
           <ScrollView style={{height:'98%'}}>
             {
               tasksData.map((data, index) => (
-                <TouchableOpacity key={index}>
+                <TouchableOpacity key={index} >
                   <View style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10 }}>
                     <View>
                       <Text style={{ marginRight: 10 }}>

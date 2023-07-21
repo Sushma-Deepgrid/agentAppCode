@@ -35,7 +35,7 @@ const Profile = () => {
           }}
         );
 
-        await  console.warn(response.data);
+        // await  console.warn(response.data);
         setUpdateModalVisible(true)
       } catch (error) {
         await  console.warn(error);

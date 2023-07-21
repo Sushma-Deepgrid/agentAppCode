@@ -1,21 +1,23 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView,ActivityIndicator, Button, Linking, Image, FlatList, Modal } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity,ActivityIndicator, Button, Linking, Image, FlatList, Modal,TextInput } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import { Video } from 'expo-av';
+import Field from '../../components/Field';
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, ROUTES } from '../../constants';
 import { VictoryPie } from "victory-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import IonIcon from 'react-native-vector-icons/Ionicons';
+import EntypoIcon from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { PropertyId, ServiceName, ServiceId, UserToken, DataTable } from '../../../store';
+import { PropertyId, ServiceName, ServiceId, UserToken, DocumentsList,
+  ImagesList,GeoTaggingList,CommentBox,PreviousGeoTaggingList,PreviousImagesList } from '../../../store';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
 import { Geofencing } from '../../../store';
 import * as FileSystem from 'expo-file-system';
 import * as Location from 'expo-location';
 import { Camera } from 'expo-camera';
-
+import MapView, { Marker, Polygon } from 'react-native-maps';
 const ECService = ({ navigation }) => {
   const { propertyId } = PropertyId.useState((s) => s);
   const { serviceName } = ServiceName.useState((s) => s);
@@ -23,6 +25,28 @@ const ECService = ({ navigation }) => {
   // console.warn(serviceId)
   const { userToken } = UserToken.useState((s) => s);
 
+  const { documentsList } = DocumentsList.useState((s) => s);
+  // console.warn(documentsList)
+
+  const { imagesList } = ImagesList.useState((s) => s);
+  // console.log("New Images:",imagesList)
+
+  const { geoTaggingList } = GeoTaggingList.useState((s) => s);
+//  console.log("New GeoTagg:",geoTaggingList)
+
+
+const { previousImagesList } = PreviousImagesList.useState((s) => s);
+  //  console.log("Previous Images:",previousImagesList)
+
+const { previousGeoTaggingList } = PreviousGeoTaggingList.useState((s) => s);
+  //  console.log("Previous Geotagg:",previousGeoTaggingList)
+
+const { commentBox } = CommentBox.useState((s) => s);
+//  console.warn(commentBox)
+
+ 
+
+ const [comment, onChangeComment] = useState();
   const [isActiveDoc, setIsActiveDoc] = useState(false);
   const [isActivePhotos, setIsActivePhotos] = useState(false);
   const [isActiveVideos, setIsActiveVideos] = useState(false);
@@ -34,13 +58,17 @@ const ECService = ({ navigation }) => {
   const [Photos1, setPhotos1] = useState([])
   const [Geotagging, setGeotagging] = useState([])
   const [PreviousGeotagging, setPreviousGeotagging] = useState([])
+  const [initialRegion, setInitialRegion] = useState(null);
+  const [MarkerPhotos, setMarkerPhotos] = useState([])
   const [ExistingPhotos, setExistingPhotos] = useState([])
+  const [PreviousPhotos, setPreviousPhotos] = useState([])
   const [ExistingDocuments, setExistingDocuments] = useState([])
   const [Videos, setVideos] = useState([])
   const [GeoFencing, setGeoFencing] = useState([])
   const [currentLocation, setCurrentLocation] = useState(null);
-  const cameraRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const cameraRef = useRef(null);
+
   function DocButtonPress() {
     setIsActiveDoc(!isActiveDoc)
     setIsActivePhotos(false)
@@ -84,19 +112,41 @@ const ECService = ({ navigation }) => {
           }
         );
 
-        await console.warn(response.data.task.geo_tagging);
+      //  await console.warn(response.data.task.previous_images)
+      console.log(response.data.task.previous_geo_tagging)
+       setMarkerPhotos(response.data.task.previous_images)
         setSelectedStatus(response.data.task.status);
         setExistingDocuments(response.data.task.documents);
-        setPreviousGeotagging(response.data.task.geo_tagging)
+
+        if(response.data.task.previous_geo_tagging != null){
+
+          setPreviousGeotagging(response.data.task.previous_geo_tagging);
+        }
+        
+
+        if(response.data.task.previous_geo_tagging != null){
+
+          const latitude=response.data.task.previous_geo_tagging[0].lat
+          const longitude=response.data.task.previous_geo_tagging[0].long
+  
+          setInitialRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.0005,
+            longitudeDelta: 0.0005,
+          });
+        }
+       
+        setPreviousPhotos(response.data.task.previous_images)
         const imagesObj=[]
-        for(let i=0;i<response.data.task.geo_tagging.length;i++){
+        for(let i=0;i<response.data.task.previous_geo_tagging.length;i++){
             imagesObj.push({
-            "imageUrl":response.data.task.images[i],
-            "lat":response.data.task.geo_tagging[i].lat,
-            "long":response.data.task.geo_tagging[i].long
+            "imageUrl":response.data.task.previous_images[i],
+            "lat":response.data.task.previous_geo_tagging[i].lat,
+            "long":response.data.task.previous_geo_tagging[i].long
             })
         }
-        console.warn(imagesObj);
+        // console.warn(imagesObj);
         setExistingPhotos(imagesObj);
         
        
@@ -106,6 +156,10 @@ const ECService = ({ navigation }) => {
       }
     }
     fetchTrackApiData();
+
+    if(commentBox != ''){
+      onChangeComment(commentBox)
+    }
   }, [1]);
   const handleDocPick = async () => {
 
@@ -170,7 +224,7 @@ const ECService = ({ navigation }) => {
 
     return (
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
-        <Image source={{ uri: item.url }} style={styles.photo} />
+        <Image source={{ uri: item.uri }} style={styles.photo} />
         <View>
           <Text>Latitude:{item.lat}</Text>
           <Text>Longitude:{item.long}</Text>
@@ -207,7 +261,8 @@ const ECService = ({ navigation }) => {
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
         <Image source={{ uri: `https://aagama2.adgrid.in/${item.imageUrl}` }} style={styles.photo} />
         <View>
-          <Text>Latitude:{item.lat}</Text>
+          <Text>
+            Latitude:{item.lat}</Text>
           <Text>Longitude:{item.long}</Text>
         </View>
         {enlarged && (
@@ -244,8 +299,14 @@ const ECService = ({ navigation }) => {
     console.log(selectedPhoto2)
   };
   const handleDeletePhoto2 = (photo) => {
-    const updatedPhotos = ExistingPhotos.filter((item) => item !== photo);
-    setExistingPhotos(updatedPhotos);
+    console.log(photo)
+//     const updatedPhotos = ExistingPhotos.filter((item) => item !== photo);
+//     setExistingPhotos(updatedPhotos);
+//     const index = ExistingPhotos.indexOf(photo.imageUrl);
+
+// console.log(index);
+// PreviousPhotos.splice(index,1)
+// PreviousGeotagging.splice(index,1)
   };
   const handleClosePhoto2 = () => {
     setSelectedPhoto2(null);
@@ -314,24 +375,52 @@ const ECService = ({ navigation }) => {
 
 
   async function savePropertyDetails(e) {
+    
     e.preventDefault();
-    console.log("Documents:", Documents);
-    console.log("Photos:", Photos);
-    console.log("Geotagging:", Geotagging);
-    console.log("selectedStatus:", selectedStatus);
-    console.log("PreviousPhotos:",ExistingPhotos)
+    setLoading(true)
+      // console.log(imagesList,geoTaggingList,previousImagesList,previousGeoTaggingList)
 
+    console.log("Documents:", documentsList);
+    console.log("selectedStatus:", selectedStatus);
+
+    console.log("Photos:", imagesList);
+    console.log("Geotagging:", geoTaggingList);
+    
+    console.log("PreviousPhotos:",previousImagesList)
+    console.log("PreviousGeotagg:",previousGeoTaggingList)
+
+    console.warn(comment)
+    CommentBox.update((s) => {
+      s.commentBox = comment;
+    });
+   
     const formData = new FormData();
     formData.append("status", selectedStatus);
-    formData.append("geo_fencing", geofencing);
-    formData.append("geo_tagging", JSON.stringify(Geotagging));
+    formData.append("geo_fencing", []);
+
+    if(geoTaggingList === []){
+      formData.append("geo_tagging", []);
+    }
+    else{
+      formData.append("geo_tagging", JSON.stringify(geoTaggingList));
+    }
+
+    if(previousGeoTaggingList === []){
+      formData.append("previous_geo_tagging", []);
+    }
+    else{
+      formData.append("previous_geo_tagging", JSON.stringify(previousGeoTaggingList));
+    }
+
+
+    formData.append("previous_images", previousImagesList);
 
     // Add photos to formData
-    for (let i = 0; i < Photos.length; i++) {
-      const photoUri = Photos[i].uri;
+    for (let i = 0; i < imagesList.length; i++) {
+      const photoUri = imagesList[i].uri;
       const photoName = photoUri.split('/').pop();
       const photoType = 'image/jpeg'; // Modify the type if needed
-      setLoading(true)
+    
       const photoData = await FileSystem.readAsStringAsync(photoUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
@@ -345,8 +434,8 @@ const ECService = ({ navigation }) => {
     }
 
     // Add documents to formData
-    for (let i = 0; i < Documents.length; i++) {
-      const documentUri = Documents[i].uri;
+    for (let i = 0; i < documentsList.length; i++) {
+      const documentUri = documentsList[i].uri;
       const documentName = documentUri.split('/').pop();
       const documentType = 'application/pdf'; // Modify the type if needed
 
@@ -376,6 +465,22 @@ const ECService = ({ navigation }) => {
 
       console.log(response);
       setLoading(false)
+      DocumentsList.update((s) => {
+        s.documentsList = [];
+      });
+      ImagesList.update((s) => {
+        s.imagesList = [];
+      });
+      GeoTaggingList.update((s) => {
+        s.geoTaggingList = [];
+      });
+      PreviousImagesList.update((s) => {
+      s.previousImagesList = [];
+    });
+    PreviousGeoTaggingList.update((s) => {
+      s.previousGeoTaggingList = [];
+    });
+    
       navigation.navigate(ROUTES.TASKS_DETAIL);
     } catch (error) {
       console.log(error);
@@ -465,6 +570,7 @@ setPhotos([...Photos, photo]);
     setPhotos1(PhotosObj);
     setLoading(false);
   };
+
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
 
   const handleCameraFlip = () => {
@@ -474,6 +580,32 @@ setPhotos([...Photos, photo]);
         : Camera.Constants.Type.back
     );
   };
+
+  const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
+
+  const handleMarkerPress = (index) => {
+    setSelectedMarkerIndex(index);
+  };
+
+  const renderImageList = () => {
+    if (selectedMarkerIndex !== null) {
+      // Replace the `imageList` array with your own array of images
+    
+      return (
+        <View style={styles.imageListContainer}>
+          <View style={styles.imagePopup}>
+            <TouchableOpacity style={{...styles.closeButton,zIndex:2}} onPress={() => setSelectedMarkerIndex(null)}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+            <Image source={{ uri: `https://aagama2.adgrid.in/${MarkerPhotos[selectedMarkerIndex]}` }} style={styles.image} />
+          </View>
+        </View>
+      );
+    }
+  
+    return null;
+  };
+  
   return (
     <>
     { (loading === true || loading === 'true') ?
@@ -491,21 +623,30 @@ setPhotos([...Photos, photo]);
           </>
           :
           <>
-          <ScrollView
+          <View
             style={styles.maincontainer}>
             <View>
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
+              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center',justifyContent:'space-between',marginVertical:10,paddingHorizontal:10 }}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
-                <Text style={{ fontSize: 24, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', fontWeight: 'bold', marginLeft: 10 }}>
+                <Text style={{ fontSize: 24,  fontWeight: 'bold'}}>
                   {serviceName}
                 </Text>
+                </View>
+                 <View >
+            <TouchableOpacity onPress={savePropertyDetails} style={{ backgroundColor: COLORS.primary, padding: 10, borderRadius: 10, paddingHorizontal: 20 }}>
+              <Text style={{ color: 'white' }}>
+                Save
+              </Text>
+            </TouchableOpacity>
+          </View>
     
     
               </View>
     
     
             </View>
-            <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between',paddingHorizontal:10 }}>
               <Text style={{ fontSize: 26 }}>
                 {/* # {propertyId} */}
               </Text>
@@ -513,7 +654,7 @@ setPhotos([...Photos, photo]);
                 <SelectDropdown
                   data={Status}
                   defaultButtonText="Select Status"
-                  buttonStyle={{ width: 150, backgroundColor: COLORS.primary, borderRadius: 10 }}
+                  buttonStyle={{ width: 150, backgroundColor: COLORS.primary, borderRadius: 10,height:35 }}
                   buttonTextStyle={{ color: 'white' }}
                   defaultValue={selectedStatus}
                   onSelect={(index) => handleStatusChange(index)}
@@ -524,7 +665,43 @@ setPhotos([...Photos, photo]);
               </View>
             </View>
     
-            <TouchableOpacity
+
+<View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingHorizontal:50,paddingVertical:15}}>
+  
+  <TouchableOpacity onPress={()=>{navigation.navigate(ROUTES.DOCUMENTS)}}>
+<Ionicons name="folder" size={80} color={COLORS.primary} />
+<Text style={{fontSize:16,textAlign:'center'}}>Documents</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity  onPress={()=>{navigation.navigate(ROUTES.IMAGES)}} >
+<EntypoIcon name="folder-images" size={80} color={COLORS.primary} />
+<Text style={{fontSize:16,textAlign:'center'}}>Images</Text>
+  </TouchableOpacity>
+
+</View>
+
+<View style={{width:'100%',paddingHorizontal:20,marginBottom:8}}>
+<TextInput 
+ multiline
+      value={comment} onChangeText={onChangeComment } placeholder="Comments"
+      style={{ borderRadius: 15,fontSize: 20,
+         borderColor: '#808080', paddingHorizontal: 10, 
+         borderWidth: 2, width:'100%', padding:10}}
+      placeholderTextColor="#808080">
+    </TextInput>
+</View>
+
+{/* <FlatList
+                  data={Photos}
+                  numColumns={2}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item }) => (
+                    <PhotoItem item={item} onPress={handlePhotoPress} onDelete={handleDeletePhoto} />
+                  )}
+                  contentContainerStyle={styles.photoGrid}
+                /> */}
+
+            {/* <TouchableOpacity
               onPress={DocButtonPress}
               style={isActiveDoc ? styles.buttonActive : styles.buttonNotActive}>
               <Text style={isActiveDoc ? styles.buttonActiveText : styles.buttonNotActiveText}>
@@ -580,26 +757,12 @@ setPhotos([...Photos, photo]);
               </Text>
     
             </TouchableOpacity>
-            {/* isActivePhotos */}
+            isActivePhotos
             {
               1 === 1 &&
               <>
-                <FlatList
-                  data={Photos1}
-                  numColumns={2}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item }) => (
-                    <PhotoItem item={item} onPress={handlePhotoPress} onDelete={handleDeletePhoto} />
-                  )}
-                  contentContainerStyle={styles.photoGrid}
-                />
-                {/* {
-                                                                                            ExistingPhotos.map((data,index)=>(
-                                                                                <Image  style={styles.image} 
-                                                                                      source={{
-                                                                                          uri:`https://aagama2.adgrid.in/${data}`,
-                                                                                        }}  />            ))
-                                                                                          } */}
+               
+               
     
     
                 <FlatList
@@ -649,25 +812,43 @@ setPhotos([...Photos, photo]);
     
     
                 </View>
-                {/* <TouchableOpacity style={styles.captureButton} onPress={handlePhotosPick}>
+                <TouchableOpacity style={styles.captureButton} onPress={handlePhotosPick}>
                   <Text style={styles.captureButtonText}>Select Files</Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
               </>
     
-            }
+            } */}
+
+
+
+<MapView style={styles.map}  initialRegion={initialRegion} >
+          
+          {
+            PreviousGeotagging != null &&
+    <> 
+    {PreviousGeotagging.map((marker, index) => (
+                 <Marker
+                   key={index}
+                   coordinate={{
+                     latitude: marker.lat,
+                     longitude: marker.long,
+                   }}
+                   title={`Marker ${index + 1}`}
+                   onPress={() => handleMarkerPress(index)}
+                 />
+               ))}
+               </>
+    }
+
+          </MapView>
+    
+          {renderImageList()}
     
     
-    
-    
-    
-          </ScrollView>
-          <View style={{ position: 'absolute', bottom: 80, right: 10 }}>
-            <TouchableOpacity onPress={savePropertyDetails} style={{ backgroundColor: COLORS.primary, padding: 10, borderRadius: 10, paddingHorizontal: 20 }}>
-              <Text style={{ color: 'white' }}>
-                Save
-              </Text>
-            </TouchableOpacity>
           </View>
+         
+
+         
         </>
     }
     </>
@@ -680,8 +861,10 @@ export default ECService;
 const styles = StyleSheet.create({
   maincontainer: {
     marginBottom: 75,
-    paddingHorizontal: 20,
-    backgroundColor: 'white',
+    flex: 1,
+  },
+  map: {
+    flex:1
   },
   image: {
     width: 100,
@@ -833,6 +1016,40 @@ const styles = StyleSheet.create({
   enlargedVideo: {
     width: '100%',
     height: '100%',
+  },
+  imageListContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    alignItems: 'center',
+  },
+  imagePopup: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'gray',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginVertical: 10,
   },
 });
 
