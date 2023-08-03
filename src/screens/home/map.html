@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@6.5.0/dist/ol.css" />
+  <style>
+    .map {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map" class="map"></div>
+  <script src="https://cdn.jsdelivr.net/npm/ol@6.5.0/dist/ol.js"></script>
+  <script>
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM(),
+        }),
+      ],
+      view: new ol.View({
+        center: [0, 0],
+        zoom: 2,
+      }),
+    });
+
+    // Add logic here to handle user interaction and draw polygons on the map.
+
+  </script>
+</body>
+</html>
