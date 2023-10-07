@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Aaagama Agent",
-    "slug": "snack-57528a2d-8c05-4976-a460-5a5e9792f852",
+    "name": "Bhuvi Realtech",
+    "slug": "aagama_new_ui",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/logo.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -16,36 +16,21 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.shivakumardeepgrid.snack6f612240717b455181e3b346cd9b02ac",
-      "infoPlist": {
-        "UIBackgroundModes": [
-          "location",
-          "fetch"
-        ]
-      }
+      "bundleIdentifier": "com.sushmanaalla.ReactnativeApp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.shivakumardeepgrid.snack6f612240717b455181e3b346cd9b02ac",
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyBTBYaoHWotIYvQvMjsxZ_Q0GNqibAZ1ww"
-        }
-      },
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.CAMERA"
-      ]
+      "package": "com.sushmanaalla.ReactnativeApp"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo.png"
     },
     "extra": {
       "eas": {
-        "projectId": "2c28e183-8c44-461f-b1e6-ade4c06e5f93"
+        "projectId": "a3b667e2-a65b-461e-b368-7533833422b4"
       }
     },
     "plugins": [
@@ -54,14 +39,7 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ],
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
-        }
       ]
-    ],
-    "owner": "mohit-deepgrid"
+    ]
   }
 }

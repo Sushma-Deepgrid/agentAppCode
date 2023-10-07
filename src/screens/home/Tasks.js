@@ -26,7 +26,7 @@ const Tasks = ({navigation}) => {
       console.log(`Bearer ${userToken}`)
       try {
         const response = await axios.get(
-          `https://aagama2.adgrid.in/user/get-tasks`,
+          `https://aagama3.adgrid.in/user/get-tasks`,
           { headers: {
             'Authorization': 'Bearer ' + userToken
           }}
@@ -75,7 +75,7 @@ function openSingleTask(id){
 <View >
       <Image  style={styles.image} 
       source={{
-        uri:`https://aagama2.adgrid.in/${item.images[0]}`,
+        uri:`https://aagama3.adgrid.in/${item.images[0]}`,
         }}  />
       
       <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 5 }}>
@@ -99,7 +99,7 @@ function openSingleTask(id){
 <Image
         style={styles.tinyLogo}
         source={{
-          uri:`https://aagama2.adgrid.in/${item.images[0]}`,
+          uri:`https://aagama3.adgrid.in/${item.images[0]}`,
         }}
       />
 

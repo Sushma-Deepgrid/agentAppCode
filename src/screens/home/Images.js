@@ -38,7 +38,7 @@ const Images = ({ navigation }) => {
       // console.warn(`Bearer ${userToken}`)
       try {
         const response = await axios.get(
-          `https://aagama2.adgrid.in/user/get-task/${serviceId}`,
+          `https://aagama3.adgrid.in/user/get-task/${serviceId}`,
           {
             headers: {
               'Authorization': 'Bearer ' + userToken
@@ -202,7 +202,7 @@ if(response.data.task.previous_geo_tagging != null &&
 
     return (
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
-        <Image source={{ uri: `https://aagama2.adgrid.in/${item.imageUrl}` }} style={styles.photo} />
+        <Image source={{ uri: `https://aagama3.adgrid.in/${item.imageUrl}` }} style={styles.photo} />
         <View>
           <Text>
             Latitude:{item.lat}</Text>
@@ -406,7 +406,7 @@ setIsCameraVisible(false);
  
     try {
       const response = await axios.put(
-        `https://aagama2.adgrid.in/user/edit-task/${serviceId}`,
+        `https://aagama3.adgrid.in/user/edit-task/${serviceId}`,
         formData,
         {
           headers: {
@@ -566,7 +566,7 @@ setIsCameraVisible(false);
                   <Modal visible={true} transparent={true} onRequestClose={handleClosePhoto2}>
                     <View style={styles.modalContainer}>
                       
-                      <Image source={{ uri: `https://aagama2.adgrid.in/${selectedPhoto2.imageUrl}` }} style={styles.enlargedPhoto} />
+                      <Image source={{ uri: `https://aagama3.adgrid.in/${selectedPhoto2.imageUrl}` }} style={styles.enlargedPhoto} />
                       <TouchableOpacity style={styles.closeButton} onPress={handleClosePhoto2}>
                         <Text style={styles.closeButtonText}>X</Text>
                       </TouchableOpacity>

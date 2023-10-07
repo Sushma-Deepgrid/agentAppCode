@@ -26,7 +26,7 @@ const Documents = ({ navigation }) => {
       // console.warn(`Bearer ${userToken}`,serviceId)
       try {
         const response = await axios.get(
-          `https://aagama2.adgrid.in/user/get-task/${serviceId}`,
+          `https://aagama3.adgrid.in/user/get-task/${serviceId}`,
           {
             headers: {
               'Authorization': 'Bearer ' + userToken
@@ -161,7 +161,7 @@ function SaveDocs(){
     
                 {
                   ExistingDocuments.map((data, index) => (
-                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`https://aagama2.adgrid.in/${data}`)}>
+                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`https://aagama3.adgrid.in/${data}`)}>
                       <Text>Document-{index + 1}
                        
                       </Text>

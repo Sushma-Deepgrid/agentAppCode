@@ -182,7 +182,7 @@ else{
   
       try {
         const response = await axios.put(
-          `https://aagama2.adgrid.in/user/edit-task/${serviceId}`,
+          `https://aagama3.adgrid.in/user/edit-task/${serviceId}`,
           formData,
           {
             headers: {

@@ -35,7 +35,7 @@ const [centroid, setCentroid] = useState([]);
         // console.warn(`Bearer ${userToken}`)
         try {
           const response = await axios.get(
-            `https://aagama2.adgrid.in/user/get-task/${serviceId}`,
+            `https://aagama3.adgrid.in/user/get-task/${serviceId}`,
             {
               headers: {
                 'Authorization': 'Bearer ' + userToken
@@ -249,7 +249,7 @@ if(Arrayposition.length != 0){
      console.log(formData)
       try {
         const response = await axios.put(
-          `https://aagama2.adgrid.in/user/edit-task/${serviceId}`,
+          `https://aagama3.adgrid.in/user/edit-task/${serviceId}`,
           formData,
           {
             headers: {

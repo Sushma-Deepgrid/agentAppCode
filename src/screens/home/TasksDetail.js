@@ -56,7 +56,7 @@ if(reload == 'true'){
       // console.warn(`Bearer ${userToken}`)
       try {
         const response = await axios.get(
-          `https://aagama2.adgrid.in/user/get-tasks`,
+          `https://aagama3.adgrid.in/user/get-tasks`,
           { headers: {
             'Authorization': 'Bearer ' + userToken
           }}
@@ -111,7 +111,7 @@ setpropertiesData(finalobj)
 
 if(finalobj.property.images != null){
 
-  const imageUrls =finalobj.property.images.map(image => `https://aagama2.adgrid.in/${image}`);
+  const imageUrls =finalobj.property.images.map(image => `https://aagama3.adgrid.in/${image}`);
   setpropertyImage(imageUrls)
 }
 else{

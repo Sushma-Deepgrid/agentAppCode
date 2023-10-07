@@ -25,7 +25,7 @@ function DrawerNavigator({navigation}) {
         drawerActiveTintColor: COLORS.white,
         headerStyle: {
           backgroundColor: COLORS.primary,
-          borderRadius:30,
+          // borderRadius:30,
         },
          headerLeft: () => (
               // App Logo

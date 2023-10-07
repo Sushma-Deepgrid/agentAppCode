@@ -90,7 +90,7 @@ const { commentBox } = CommentBox.useState((s) => s);
       // console.warn(`Bearer ${userToken}`)
       try {
         const response = await axios.get(
-          `https://aagama2.adgrid.in/user/get-task/${serviceId}`,
+          `https://aagama3.adgrid.in/user/get-task/${serviceId}`,
           {
             headers: {
               'Authorization': 'Bearer ' + userToken
@@ -252,7 +252,7 @@ const { commentBox } = CommentBox.useState((s) => s);
 
     return (
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
-        <Image source={{ uri: `https://aagama2.adgrid.in/${item.imageUrl}` }} style={styles.photo} />
+        <Image source={{ uri: `https://aagama3.adgrid.in/${item.imageUrl}` }} style={styles.photo} />
         <View>
           <Text>
             Latitude:{item.lat}</Text>
@@ -434,7 +434,7 @@ const { commentBox } = CommentBox.useState((s) => s);
 
     try {
       const response = await axios.put(
-        `https://aagama2.adgrid.in/user/edit-task/${serviceId}`,
+        `https://aagama3.adgrid.in/user/edit-task/${serviceId}`,
         formData,
         {
           headers: {
@@ -569,7 +569,7 @@ setPhotos([...Photos, photo]);
             <TouchableOpacity style={{...styles.closeButton,zIndex:2}} onPress={() => setSelectedMarkerIndex(null)}>
               <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
-            <Image source={{ uri: `https://aagama2.adgrid.in/${MarkerPhotos[selectedMarkerIndex]}` }} style={styles.image} />
+            <Image source={{ uri: `https://aagama3.adgrid.in/${MarkerPhotos[selectedMarkerIndex]}` }} style={styles.image} />
           </View>
         </View>
       );
@@ -706,7 +706,7 @@ setPhotos([...Photos, photo]);
     
                 {
                   ExistingDocuments.map((data, index) => (
-                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`https://aagama2.adgrid.in/${data}`)}>
+                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`https://aagama3.adgrid.in/${data}`)}>
                       <Text>Document-{index + 1}
                        
                       </Text>
@@ -761,7 +761,7 @@ setPhotos([...Photos, photo]);
                 {selectedPhoto2 != null && (
                   <Modal visible={true} transparent={true} onRequestClose={handleClosePhoto2}>
                     <View style={styles.modalContainer}>
-                      <Image source={{ uri: `https://aagama2.adgrid.in/${selectedPhoto2}` }} style={styles.enlargedPhoto} />
+                      <Image source={{ uri: `https://aagama3.adgrid.in/${selectedPhoto2}` }} style={styles.enlargedPhoto} />
                       <TouchableOpacity style={styles.closeButton} onPress={handleClosePhoto2}>
                         <Text style={styles.closeButtonText}>X</Text>
                       </TouchableOpacity>

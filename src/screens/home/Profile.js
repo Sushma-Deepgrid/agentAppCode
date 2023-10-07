@@ -22,7 +22,7 @@ const Profile = () => {
     
     try {
       const response = await axios.get(
-        `https://aagama2.adgrid.in/user/get-user-profile/${userId}`,
+        `https://aagama3.adgrid.in/user/get-user-profile/${userId}`,
         
         {
           headers: {
@@ -54,7 +54,7 @@ const Profile = () => {
       }
       try {
         const response = await axios.put(
-          `https://aagama2.adgrid.in/user/edit-user-profile/${userId}`,obj,
+          `https://aagama3.adgrid.in/user/edit-user-profile/${userId}`,obj,
           { headers: {
             'Authorization': 'Bearer ' + userToken
           }}

@@ -19,6 +19,7 @@ const Login = ({navigation}) => {
   //  const navigation = useNavigation();
   const [email, onChangeText] = useState('');
   const [password, onChangeNumber] = useState();
+  const [selectedRole, setSelectedRole] = useState({ name: 'Agent', value: 4 });
 
 
   function LoginFunction(){
@@ -26,9 +27,10 @@ const Login = ({navigation}) => {
    
     if(email != '' && password != ''){
     //  navigation.navigate(ROUTES.HOME)
-    axios.post(`https://aagama2.adgrid.in/auth/customer-login`, {
+    axios.post(`https://aagama3.adgrid.in/auth/customer-login`, {
       email: email,
-      password: password
+      password: password,
+      user_type_category_id:selectedRole.value
     })
  
 

@@ -23,7 +23,7 @@ const Home = ({navigation}) => {
       // console.log(userToken)
       try {
         const response = await axios.get(
-          `https://aagama2.adgrid.in/user/get-tasks`,
+          `https://aagama3.adgrid.in/user/get-tasks`,
           { headers: {
             'Authorization': 'Bearer ' + userToken
           }}
@@ -56,7 +56,7 @@ const handleStatusChange = (index) => {
           // console.log(userToken)
           try {
             const response = await axios.get(
-              `https://aagama2.adgrid.in/user/get-tasks`,
+              `https://aagama3.adgrid.in/user/get-tasks`,
               { headers: {
                 'Authorization': 'Bearer ' + userToken
               }}
