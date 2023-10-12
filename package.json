@@ -1,5 +1,4 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -16,6 +15,7 @@
     "@react-navigation/drawer": "*",
     "@react-navigation/native": "*",
     "@react-navigation/stack": "*",
+    "@shopify/react-native-skia": "^0.1.213",
     "axios": "*",
     "expo": "~47.0.14",
     "expo-av": "~13.0.3",
