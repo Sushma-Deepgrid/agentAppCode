@@ -8,7 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 export default function App() {
   SplashScreen.preventAutoHideAsync();
-setTimeout(SplashScreen.hideAsync, 5000);
+  setTimeout(SplashScreen.hideAsync, 3000);
   // isAuthenticated = is...
   return (
     <NavigationContainer>

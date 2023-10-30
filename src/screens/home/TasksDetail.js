@@ -22,9 +22,10 @@ import {
 } from '../../../store'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5'
-
+import { API_URL } from '@env';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios'
+
 const TasksDetails = ({ navigation }) => {
   const { width } = Dimensions.get('window')
   const { propertyId } = PropertyId.useState((s) => s)
@@ -69,7 +70,7 @@ const TasksDetails = ({ navigation }) => {
       // console.warn(`Bearer ${userToken}`)
       try {
         const response = await axios.get(
-          `https://aagama3.adgrid.in/user/get-tasks`,
+          `${API_URL}/user/get-tasks`,
           {
             headers: {
               Authorization: 'Bearer ' + userToken
@@ -121,7 +122,7 @@ const TasksDetails = ({ navigation }) => {
 
         if (finalobj.property.images != null) {
           const imageUrls = finalobj.property.images.map(
-            (image) => `https://aagama3.adgrid.in/${image}`
+            (image) => `${API_URL}/${image}`
           )
           setpropertyImage(imageUrls)
         } else {
@@ -345,19 +346,27 @@ const TasksDetails = ({ navigation }) => {
   }
 
   const handleLink1Press = () => {
-    const zoomLevel = 21
-    const url = `https://www.google.com/maps?q=${propertyLat},${propertyLong}&ll=${propertyLat},${propertyLong}&z=${zoomLevel}`
-    console.log('url', url)
+    if (!propertyLat || !propertyLong) {
+      console.log("Latitude or Longitude is not set.");
+      return;
+    }
+    const zoomLevel = 21;
+    const url = `https://www.google.com/maps/search/?api=1&query=${propertyLat},${propertyLong}&z=${zoomLevel}`;
+
+
+    console.log('Attempting to open URL:', url);
+    
     Linking.canOpenURL(url)
       .then((supported) => {
         if (supported) {
-          return Linking.openURL(url)
+          return Linking.openURL(url);
         } else {
-          console.log("Can't open Google Maps")
+          console.log("Cannot open Google Maps");
         }
       })
-      .catch((error) => console.log('Error occurred:', error))
+      .catch((error) => console.log('Error occurred:', error));
   }
+  
 
   return (
     <>

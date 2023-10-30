@@ -7,6 +7,8 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import { UserToken,PropertyId,ServiceName,ServiceId } from '../../../store';
 import SelectDropdown from 'react-native-select-dropdown';
+import { API_URL } from '@env';
+
 const Home = ({navigation}) => {
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -23,7 +25,7 @@ const Home = ({navigation}) => {
       // console.log(userToken)
       try {
         const response = await axios.get(
-          `https://aagama3.adgrid.in/user/get-tasks`,
+          `${API_URL}/user/get-tasks`,
           { headers: {
             'Authorization': 'Bearer ' + userToken
           }}
@@ -56,7 +58,7 @@ const handleStatusChange = (index) => {
           // console.log(userToken)
           try {
             const response = await axios.get(
-              `https://aagama3.adgrid.in/user/get-tasks`,
+              `${API_URL}/user/get-tasks`,
               { headers: {
                 'Authorization': 'Bearer ' + userToken
               }}

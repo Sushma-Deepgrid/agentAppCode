@@ -1,4 +1,5 @@
 {
+  "main": "index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -15,7 +16,7 @@
     "@react-navigation/drawer": "*",
     "@react-navigation/native": "*",
     "@react-navigation/stack": "*",
-    "@shopify/react-native-skia": "^0.1.213",
+    "@shopify/react-native-skia": "^0.1.157",
     "axios": "*",
     "expo": "~47.0.14",
     "expo-av": "~13.0.3",
@@ -35,6 +36,7 @@
     "react-dom": "18.1.0",
     "react-native": "0.70.8",
     "react-native-document-picker": "*",
+    "react-native-dotenv": "^3.4.9",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-linear-gradient": "*",
     "react-native-maps": "^1.3.2",

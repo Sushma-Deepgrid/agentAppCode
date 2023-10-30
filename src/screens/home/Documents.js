@@ -5,6 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PropertyId, ServiceName, ServiceId, UserToken, DocumentsList } from '../../../store';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
+import { API_URL } from '@env';
 
 const Documents = ({ navigation }) => {
   const { propertyId } = PropertyId.useState((s) => s);
@@ -26,7 +27,7 @@ const Documents = ({ navigation }) => {
       // console.warn(`Bearer ${userToken}`,serviceId)
       try {
         const response = await axios.get(
-          `https://aagama3.adgrid.in/user/get-task/${serviceId}`,
+          `${API_URL}/user/get-task/${serviceId}`,
           {
             headers: {
               'Authorization': 'Bearer ' + userToken
@@ -161,7 +162,7 @@ function SaveDocs(){
     
                 {
                   ExistingDocuments.map((data, index) => (
-                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`https://aagama3.adgrid.in/${data}`)}>
+                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`${API_URL}/${data}`)}>
                       <Text>Document-{index + 1}
                        
                       </Text>

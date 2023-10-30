@@ -6,6 +6,7 @@ import { COLORS, ROUTES, IMGS } from '../../constants';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PropertyId, ServiceName, ServiceId, UserToken, DataTable } from '../../../store';
+import { API_URL } from '@env';
 
 export default function EnterLocation({navigation}) {
  
@@ -182,7 +183,7 @@ else{
   
       try {
         const response = await axios.put(
-          `https://aagama3.adgrid.in/user/edit-task/${serviceId}`,
+          `${API_URL}/user/edit-task/${serviceId}`,
           formData,
           {
             headers: {

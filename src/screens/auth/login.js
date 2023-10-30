@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import Field from '../../components/Field';
-import Button from '../../components/Button';
+import React, { useState } from 'react'
+import Field from '../../components/Field'
+import Button from '../../components/Button'
 import {
   View,
   Text,
@@ -11,128 +11,138 @@ import {
   TouchableOpacity,
   Image
 } from 'react-native'
-import {COLORS, ROUTES,IMGS} from '../../constants';
-import {useNavigation} from '@react-navigation/native';
-import { AuthStore,UserToken,UserFirstName,UserId,UserLastName,UserMobile } from "../../../store";
-import axios from 'axios';
-const Login = ({navigation}) => {
-  //  const navigation = useNavigation();
-  const [email, onChangeText] = useState('');
-  const [password, onChangeNumber] = useState();
-  const [selectedRole, setSelectedRole] = useState({ name: 'Agent', value: 4 });
+import { COLORS, ROUTES, IMGS } from '../../constants'
+import {
+  AuthStore,
+  UserToken,
+  UserId,
+  UserFirstName,
+  UserLastName,
+  UserMobile
+} from '../../../store'
+import axios from 'axios'
+import { API_URL } from '@env'
 
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [selectedRole, setSelectedRole] = useState({ name: 'Agent', value: 4 })
 
-  function LoginFunction(){
+  function LoginFunction() {
     console.log(email, password)
-   
-    if(email != '' && password != ''){
-    //  navigation.navigate(ROUTES.HOME)
-    axios.post(`https://aagama3.adgrid.in/auth/customer-login`, {
-      email: email,
-      password: password,
-      user_type_category_id:selectedRole.value
-    })
- 
 
-    .then((response) => {
-      console.log(response.data,"login");
-      UserToken.update((s) => {
-        s.userToken = response.data.token;
-      });
+    if (email !== '' && password !== '') {
+      console.log('API_URL', API_URL)
+      axios
+        .post(`${API_URL}/auth/customer-login`, {
+          email: email,
+          password: password,
+          user_type_category_id: selectedRole.value
+        })
+        .then((response) => {
+          console.log(response.data, 'login')
 
-      UserId.update((s) => {
-        s.userId = response.data.user_id;
-      });
+          UserToken.update((s) => ({ ...s, userToken: response.data.token }))
 
-      UserFirstName.update((s) => {
-        s.userFirstName = response.data.first_name;
-      });
+          UserId.update((s) => ({ ...s, userId: response.data.user_id }))
 
-      UserLastName.update((s) => {
-        s.userLastName = response.data.last_name;
-      });
+          UserFirstName.update((s) => ({
+            ...s,
+            userFirstName: response.data.first_name
+          }))
 
-      UserMobile.update((s) => {
-        s.userMobile = response.data.mobile;
-      });
-     
-         console.log(response.data.user_type_id)
+          UserLastName.update((s) => ({
+            ...s,
+            userLastName: response.data.last_name
+          }))
 
-           if(response.data.user_type_id === 3 || response.data.user_type_id === 2){
-            alert("Incorrect Email or Password")
-           
-             
-           }
-           else{
+          UserMobile.update((s) => ({ ...s, userMobile: response.data.mobile }))
+
+          console.log(response.data.user_type_id)
+
+          if (
+            response.data.user_type_id === 3 ||
+            response.data.user_type_id === 2
+          ) {
+            alert('Incorrect Email or Password')
+          } else {
             navigation.navigate(ROUTES.HOME)
 
-            AuthStore.update((s) => {
-                s.isLoggedIn = true;
-              });
-
-           }
-           
-         
- 
-      
-    } )
-    .catch((error) => {
-      
-                    console.log(error);
-                    alert("Incorrect Email or Password")
-    });
+            AuthStore.update((s) => ({ ...s, isLoggedIn: true }))
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          alert('Incorrect Email or Password')
+        })
+    } else {
+      alert('Please enter both Email and Password')
     }
-    else{
-       alert("Please enter both Email and Password")
-    } 
   }
-  return (
-    
-      <SafeAreaView style={styles.wrapper}>
-        <View style={styles.container}>
-        <View>
-           <Image
-                style={{
-                  width: 256,
-                  height: 128,marginBottom:20
-                }}
-                source={IMGS.LOGOLOGIN}
-                resizeMode="contain"
-              />
-        </View>
-          <View style={{width:'100%', marginBottom: 30,alignItems:'center' }}>
-          <Field value={email} onChangeText={onChangeText} placeholder="Email or Mobile Number" keyboardType={'email-address'}/>
-          </View>
-          <View style={{width:'100%',alignItems:'center' }}>
-        <Field value={password} onChangeText={onChangeNumber} placeholder="Password" secureTextEntry={true}  />
-          </View>
-          <View style={{alignItems:'flex-end', width:'80%', paddingRight:16, marginBottom: 30}}>
-          <TouchableOpacity onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}>
-          <Text style={{color:'#808080',fontSize:16,fontWeight:'bold'}}>
-            Forgot Password ?
-          </Text>
-          </TouchableOpacity>
-          
-        </View>
-        <Button textColor="white" bgColor="#34447d" btnLabel="Login" Press={LoginFunction}/>
 
-       
-         {/* <View style={{display:'flex',justifyContent:'center', flexDirection:'row',marginTop:30}}>
-          <Text style={{marginRight:5}}>
-            Don't have an account ? 
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate(ROUTES.SIGNUP)}>
-            <Text style={{color:'#34447d', fontWeight:'bold'}}>
-              Signup
+  return (
+    <SafeAreaView style={styles.wrapper}>
+      <View style={styles.container}>
+        <View>
+          <Image
+            style={{ width: 256, height: 128, marginBottom: 20 }}
+            source={IMGS.LOGOLOGIN}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={{ width: '100%', marginBottom: 30, alignItems: 'center' }}>
+          <Field
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Email or Mobile Number"
+            keyboardType="email-address"
+          />
+        </View>
+        <View style={{ width: '100%', alignItems: 'center' }}>
+          <Field
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            secureTextEntry={true}
+          />
+        </View>
+        <View
+          style={{
+            alignItems: 'flex-end',
+            width: '80%',
+            paddingRight: 16,
+            marginBottom: 30
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
+          >
+            <Text
+              style={{ color: '#808080', fontSize: 16, fontWeight: 'bold' }}
+            >
+              Forgot Password ?
             </Text>
           </TouchableOpacity>
-        </View>  */}
         </View>
-       
-      </SafeAreaView>
-   
-  );
-};
+        <Button
+          textColor="white"
+          bgColor="#34447d"
+          btnLabel="Login"
+          Press={LoginFunction}
+        />
+
+        {/* Commented out section
+        <View style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', marginTop: 30 }}>
+          <Text style={{ marginRight: 5 }}>Don't have an account ?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate(ROUTES.SIGNUP)}>
+            <Text style={{ color: '#34447d', fontWeight: 'bold' }}>Signup</Text>
+          </TouchableOpacity>
+        </View>
+        */}
+      </View>
+    </SafeAreaView>
+  )
+}
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -143,7 +153,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent:'center'
-  },
-});
-export default Login;
+    justifyContent: 'center'
+  }
+})
+
+export default Login

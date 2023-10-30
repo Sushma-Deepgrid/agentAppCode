@@ -6,6 +6,8 @@ import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PropertyId} from '../../../store';
 import { UserToken } from '../../../store';
 import axios from 'axios';
+import { API_URL } from '@env';
+
 const Tasks = ({navigation}) => {
   const [items, setItems] = React.useState([])
   const [refreshing, setRefreshing] = React.useState(false);
@@ -26,7 +28,7 @@ const Tasks = ({navigation}) => {
       console.log(`Bearer ${userToken}`)
       try {
         const response = await axios.get(
-          `https://aagama3.adgrid.in/user/get-tasks`,
+          `${API_URL}/user/get-tasks`,
           { headers: {
             'Authorization': 'Bearer ' + userToken
           }}
@@ -75,7 +77,7 @@ function openSingleTask(id){
 <View >
       <Image  style={styles.image} 
       source={{
-        uri:`https://aagama3.adgrid.in/${item.images[0]}`,
+        uri:`${API_URL}/${item.images[0]}`,
         }}  />
       
       <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 5 }}>
@@ -99,7 +101,7 @@ function openSingleTask(id){
 <Image
         style={styles.tinyLogo}
         source={{
-          uri:`https://aagama3.adgrid.in/${item.images[0]}`,
+          uri:`${API_URL}/${item.images[0]}`,
         }}
       />
 

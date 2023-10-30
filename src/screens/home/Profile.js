@@ -6,6 +6,8 @@ import Button from '../../components/Button';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import { UserToken,UserFirstName,UserLastName,UserMobile,UserId} from '../../../store';
 import axios from 'axios';
+import { API_URL } from '@env';
+
 const Profile = () => {
 
   const { userToken } = UserToken.useState((s) => s);
@@ -22,7 +24,7 @@ const Profile = () => {
     
     try {
       const response = await axios.get(
-        `https://aagama3.adgrid.in/user/get-user-profile/${userId}`,
+        `${API_URL}/user/get-user-profile/${userId}`,
         
         {
           headers: {
@@ -54,7 +56,7 @@ const Profile = () => {
       }
       try {
         const response = await axios.put(
-          `https://aagama3.adgrid.in/user/edit-user-profile/${userId}`,obj,
+          `${API_URL}/user/edit-user-profile/${userId}`,obj,
           { headers: {
             'Authorization': 'Bearer ' + userToken
           }}

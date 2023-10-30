@@ -7,9 +7,10 @@ import * as FileSystem from 'expo-file-system';
 import { PropertyId, ServiceName, ServiceId, UserToken,Reload } from '../../../store';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
-import * as Location from 'expo-location';
+// import * as Location from 'expo-location';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
+import { API_URL } from '@env';
 
 const Images = ({ navigation }) => {
   const { serviceName } = ServiceName.useState((s) => s);
@@ -38,7 +39,7 @@ const Images = ({ navigation }) => {
       // console.warn(`Bearer ${userToken}`)
       try {
         const response = await axios.get(
-          `https://aagama3.adgrid.in/user/get-task/${serviceId}`,
+          `${API_URL}/user/get-task/${serviceId}`,
           {
             headers: {
               'Authorization': 'Bearer ' + userToken
@@ -48,14 +49,13 @@ const Images = ({ navigation }) => {
 console.log( response.data.task.previous_images)
 setSelectedStatus(response.data.task.status)
 setComment(response.data.task.comments)
-if(response.data.task.previous_geo_tagging != null && 
-  response.data.task.previous_images != null){
+if(!response.data.task.previous_geo_tagging && !response.data.task.previous_images){
     setPreviousGeotag(response.data.task.previous_geo_tagging)
     setPreviousPhotos(response.data.task.previous_images)
   }
 
         const imagesObj=[]
-        for(let i=0;i<response.data.task.previous_geo_tagging.length;i++){
+        for(let i=0;i<response.data.task.previous_geo_tagging?.length;i++){
             imagesObj.push({
             "imageUrl":response.data.task.previous_images[i],
             "lat":response.data.task.previous_geo_tagging[i].lat,
@@ -202,7 +202,7 @@ if(response.data.task.previous_geo_tagging != null &&
 
     return (
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
-        <Image source={{ uri: `https://aagama3.adgrid.in/${item.imageUrl}` }} style={styles.photo} />
+        <Image source={{ uri: `${API_URL}/${item.imageUrl}` }} style={styles.photo} />
         <View>
           <Text>
             Latitude:{item.lat}</Text>
@@ -363,21 +363,21 @@ setIsCameraVisible(false);
     formData.append("status", selectedStatus);
     formData.append("geo_fencing", []);
 
-    if(Geotagging === []){
+    if(Geotagging.length === 0){
       formData.append("geo_tagging", []);
     }
     else{
       formData.append("geo_tagging", JSON.stringify(Geotagging));
     }
 
-    if(PreviousGeotag === []){
+    if(PreviousGeotag.length === 0){
       formData.append("previous_geo_tagging", []);
     }
     else{
       formData.append("previous_geo_tagging", JSON.stringify(PreviousGeotag));
     }
 
-    if(PreviousPhotos === []){
+    if(PreviousPhotos.length === 0){
       formData.append("previous_images", []);
     }
     else{
@@ -406,7 +406,7 @@ setIsCameraVisible(false);
  
     try {
       const response = await axios.put(
-        `https://aagama3.adgrid.in/user/edit-task/${serviceId}`,
+        `${API_URL}/user/edit-task/${serviceId}`,
         formData,
         {
           headers: {
@@ -566,7 +566,7 @@ setIsCameraVisible(false);
                   <Modal visible={true} transparent={true} onRequestClose={handleClosePhoto2}>
                     <View style={styles.modalContainer}>
                       
-                      <Image source={{ uri: `https://aagama3.adgrid.in/${selectedPhoto2.imageUrl}` }} style={styles.enlargedPhoto} />
+                      <Image source={{ uri: `${API_URL}/${selectedPhoto2.imageUrl}` }} style={styles.enlargedPhoto} />
                       <TouchableOpacity style={styles.closeButton} onPress={handleClosePhoto2}>
                         <Text style={styles.closeButtonText}>X</Text>
                       </TouchableOpacity>

@@ -8,6 +8,8 @@ import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PropertyId, ServiceName, ServiceId, UserToken, DataTable } from '../../../store';
 import * as geolib from 'geolib';
+import { API_URL } from '@env';
+
 export default function GeoFencing({navigation}) {
   const [initialRegion, setInitialRegion] = useState(null);
 
@@ -35,7 +37,7 @@ const [centroid, setCentroid] = useState([]);
         // console.warn(`Bearer ${userToken}`)
         try {
           const response = await axios.get(
-            `https://aagama3.adgrid.in/user/get-task/${serviceId}`,
+            `${API_URL}/user/get-task/${serviceId}`,
             {
               headers: {
                 'Authorization': 'Bearer ' + userToken
@@ -249,7 +251,7 @@ if(Arrayposition.length != 0){
      console.log(formData)
       try {
         const response = await axios.put(
-          `https://aagama3.adgrid.in/user/edit-task/${serviceId}`,
+          `${API_URL}/user/edit-task/${serviceId}`,
           formData,
           {
             headers: {
