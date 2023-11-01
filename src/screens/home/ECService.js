@@ -33,10 +33,11 @@ import axios from 'axios'
 import * as FileSystem from 'expo-file-system'
 import * as Location from 'expo-location'
 import { Camera } from 'expo-camera'
-import MapView, { Marker, Polygon } from 'react-native-maps'
+import MapView, { Marker, PROVIDER_GOOGLE, Polygon } from 'react-native-maps'
 import { API_URL } from '@env'
 
 const ECService = ({ navigation }) => {
+  
   const { propertyId } = PropertyId.useState((s) => s)
   const { serviceName } = ServiceName.useState((s) => s)
   const { serviceId } = ServiceId.useState((s) => s)
@@ -71,6 +72,14 @@ const ECService = ({ navigation }) => {
   const [currentLocation, setCurrentLocation] = useState(null)
   const [loading, setLoading] = useState(false)
   const cameraRef = useRef(null)
+  // const [mapRegion, setMapRegion] = useState({
+  //   latitude:17.382535553930502,
+  //   longitude:78.45439412113012,
+  //   latitudeDelta: 0.0922,
+  //   longitudeDelta:0.0421
+  // })
+
+  
 
   function DocButtonPress() {
     setIsActiveDoc(!isActiveDoc)
@@ -101,6 +110,7 @@ const ECService = ({ navigation }) => {
   }
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchTrackApiData() {
       // console.warn(`Bearer ${userToken}`)
       try {
@@ -131,9 +141,9 @@ const ECService = ({ navigation }) => {
         }
         setPreviousPhotos(response.data.task.previous_images)
 
-        if (response.data.task.previous_geo_tagging != null) {
-          const latitude = response.data.task.previous_geo_tagging[0].lat
-          const longitude = response.data.task.previous_geo_tagging[0].long
+        if (response.data.task.previous_geo_tagging && response.data.task.previous_geo_tagging.length > 0) {
+          const latitude = response.data.task.previous_geo_tagging[0].lat;
+          const longitude = response.data.task.previous_geo_tagging[0].long;  
 
           setInitialRegion({
             latitude,
@@ -158,11 +168,16 @@ const ECService = ({ navigation }) => {
         // console.warn(imagesObj);
         setExistingPhotos(imagesObj)
       } catch (error) {
-        await console.warn(error)
-        // window.alert("Can't Assign Same Track Name")
-      }
+        console.warn(error);
+        // Here we can add a more user-friendly error message or action.
+        alert("An error occurred while fetching data. Please try again later.");
+    }
+    
     }
     fetchTrackApiData()
+    return () => {
+      isMounted = false;  // cleanup function to set the flag to false when the component unmounts
+  };
   }, [1])
   const handleDocPick = async () => {
     let result = await DocumentPicker.getDocumentAsync({})
@@ -466,7 +481,7 @@ const ECService = ({ navigation }) => {
   }
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync()
       console.log(status)
       if (status !== 'granted') {
@@ -475,7 +490,13 @@ const ECService = ({ navigation }) => {
       } else {
         let { coords } = await Location.getCurrentPositionAsync({})
 
-        console.log(coords)
+        console.log("coord",coords)
+          setInitialRegion({
+            latitude:coords?.latitude,
+            longitude:coords?.longitude,
+            latitudeDelta: 0.0005,
+            longitudeDelta: 0.0005
+          })
       }
     })()
   }, [])
@@ -520,7 +541,7 @@ const ECService = ({ navigation }) => {
     }
     setLoading(true)
     obj.push(photoWithLocation)
-    console.log(obj)
+    console.log("obj",obj)
 
     const PhotosObj = [...Photos1]
 
@@ -529,9 +550,9 @@ const ECService = ({ navigation }) => {
       lat: latitude,
       long: longitude
     }
-    console.log(xobj)
+    console.log("xobj",xobj)
     PhotosObj.push(xobj)
-    console.log(PhotosObj)
+    console.log("PhotosObj",PhotosObj)
     // Append photo to Photos array
     setGeotagging(obj)
 
@@ -879,8 +900,10 @@ const ECService = ({ navigation }) => {
     
             } */}
 
-            <MapView style={styles.map} initialRegion={initialRegion}>
-              {PreviousGeotagging != null && (
+            <MapView style={styles.map} initialRegion={initialRegion} provider={PROVIDER_GOOGLE} showsUserLocation={true}
+             //region={mapRegion} 
+             >
+              {PreviousGeotagging.length > 0 && (
                 <>
                   {PreviousGeotagging.map((marker, index) => (
                     <Marker
@@ -913,7 +936,9 @@ const styles = StyleSheet.create({
     flex: 1
   },
   map: {
-    flex: 1
+    flex: 1,
+    width: 390,
+    height: 10
   },
   image: {
     width: 100,
