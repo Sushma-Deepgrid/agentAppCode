@@ -62,7 +62,10 @@ const ECService = ({ navigation }) => {
   const [Photos1, setPhotos1] = useState([])
   const [Geotagging, setGeotagging] = useState([])
   const [PreviousGeotagging, setPreviousGeotagging] = useState([])
-  const [initialRegion, setInitialRegion] = useState(null)
+  const [initialRegion, setInitialRegion] = useState({latitude:17.362574234889156, 
+    longitude:78.4740328502232,
+    latitudeDelta: 0.0005,
+    longitudeDelta: 0.0005})
   const [MarkerPhotos, setMarkerPhotos] = useState([])
   const [ExistingPhotos, setExistingPhotos] = useState([])
   const [PreviousPhotos, setPreviousPhotos] = useState([])
@@ -168,7 +171,7 @@ const ECService = ({ navigation }) => {
         // console.warn(imagesObj);
         setExistingPhotos(imagesObj)
       } catch (error) {
-        console.warn(error);
+        console.error(error);
         // Here we can add a more user-friendly error message or action.
         alert("An error occurred while fetching data. Please try again later.");
     }
@@ -274,7 +277,7 @@ const ECService = ({ navigation }) => {
     return (
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
         <Image
-          source={{ uri: `${API_URL}/${item.imageUrl}` }}
+          source={{ uri: `https://aagama2.adgrid.in/${item?.imageUrl}` }}
           style={styles.photo}
         />
         <View>
@@ -471,7 +474,7 @@ const ECService = ({ navigation }) => {
 
       navigation.goBack()
     } catch (error) {
-      console.log(error)
+      console.error('API Error:', error);
     }
 
     console.log(Videos)
@@ -483,14 +486,14 @@ const ECService = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync()
-      console.log(status)
+      console.log("status",status)
       if (status !== 'granted') {
         // Handle permission denied
         return
       } else {
         let { coords } = await Location.getCurrentPositionAsync({})
 
-        console.log("coord",coords)
+        console.log("coord###",coords)
           setInitialRegion({
             latitude:coords?.latitude,
             longitude:coords?.longitude,
@@ -591,7 +594,7 @@ const ECService = ({ navigation }) => {
             </TouchableOpacity>
             <Image
               source={{
-                uri: `${API_URL}/${MarkerPhotos[selectedMarkerIndex]}`
+                uri: `https://aagama2.adgrid.in/${MarkerPhotos[selectedMarkerIndex]}`
               }}
               style={styles.image}
             />
@@ -900,10 +903,10 @@ const ECService = ({ navigation }) => {
     
             } */}
 
-            <MapView style={styles.map} initialRegion={initialRegion} provider={PROVIDER_GOOGLE} showsUserLocation={true}
-             //region={mapRegion} 
-             >
-              {PreviousGeotagging.length > 0 && (
+             {/* <MapView style={styles.map} initialRegion={initialRegion} provider={PROVIDER_GOOGLE} showsUserLocation={true}
+            
+             > 
+             {PreviousGeotagging.length > 0 && (
                 <>
                   {PreviousGeotagging.map((marker, index) => (
                     <Marker
@@ -918,7 +921,7 @@ const ECService = ({ navigation }) => {
                   ))}
                 </>
               )}
-            </MapView>
+            </MapView>*/}
 
             {renderImageList()}
           </View>

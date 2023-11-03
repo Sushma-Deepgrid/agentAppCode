@@ -1,206 +1,253 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView,ActivityIndicator, Button, Linking, Image, FlatList, Modal } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
-import { COLORS, ROUTES } from '../../constants';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { PropertyId, ServiceName, ServiceId, UserToken, DocumentsList } from '../../../store';
-import * as DocumentPicker from 'expo-document-picker';
-import axios from 'axios';
-import { API_URL } from '@env';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Button,
+  Linking,
+  Image,
+  FlatList,
+  Modal
+} from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { COLORS, ROUTES } from '../../constants'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import {
+  PropertyId,
+  ServiceName,
+  ServiceId,
+  UserToken,
+  DocumentsList
+} from '../../../store'
+import * as DocumentPicker from 'expo-document-picker'
+import axios from 'axios'
+import { API_URL } from '@env'
 
 const Documents = ({ navigation }) => {
-  const { propertyId } = PropertyId.useState((s) => s);
-  const { serviceName } = ServiceName.useState((s) => s);
-  const { serviceId } = ServiceId.useState((s) => s);
+  const { propertyId } = PropertyId.useState((s) => s)
+  const { serviceName } = ServiceName.useState((s) => s)
+  const { serviceId } = ServiceId.useState((s) => s)
   // console.warn(serviceId)
-  const { userToken } = UserToken.useState((s) => s);
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const { userToken } = UserToken.useState((s) => s)
+  const [selectedStatus, setSelectedStatus] = useState('')
   const [Documents, setDocuments] = useState([])
   const [ExistingDocuments, setExistingDocuments] = useState([])
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { documentsList } = DocumentsList.useState((s) => s);
+  const { documentsList } = DocumentsList.useState((s) => s)
   console.warn(documentsList)
   useEffect(() => {
-
     async function fetchTrackApiData() {
-
       // console.warn(`Bearer ${userToken}`,serviceId)
       try {
         const response = await axios.get(
           `${API_URL}/user/get-task/${serviceId}`,
           {
             headers: {
-              'Authorization': 'Bearer ' + userToken
+              Authorization: 'Bearer ' + userToken
             }
           }
-        );
+        )
 
         // await console.warn(response.data.task)
-        
-        setExistingDocuments(response.data.task.documents);
+
+        setExistingDocuments(response.data.task.documents)
         setDocuments(documentsList)
-       
       } catch (error) {
-        await console.warn(error);
+        await console.warn(error)
         // window.alert("Can't Assign Same Track Name")
       }
     }
-    fetchTrackApiData();
-  }, [1]);
+    fetchTrackApiData()
+  }, [1])
   const handleDocPick = async () => {
-
-    let result = await DocumentPicker.getDocumentAsync({});
-    const uploadDate = new Date();
-
     // alert(result.uri);
-    alert(`Uploaded ${result.name} Succesfully`)
+    let result = await DocumentPicker.getDocumentAsync({})
+    const uploadDate = new Date()
+
+    console.log('result', result)
+    console.log('result', result?.name)
+
+    if (result.type !== 'cancel') {
+      console.log('resultoooooooooo', result)
+      alert(`Uploaded ${result?.name} Successfully`)
+    } else {
+      alert('Cancelled')
+    }
+
     const obj = [...Documents]
 
     obj.push({
       name: result.name,
       uploadedDate: uploadDate, // Include the upload date in the document object
-      uri: result.uri,
-    });
+      uri: result.uri
+    })
     setDocuments(obj)
 
-    console.log(obj);
-    console.log(Documents);
-
+    console.log(obj)
+    console.log(Documents)
   }
 
-
- 
-
-
-
- 
-
   const handleLinkPress = async (url) => {
-    const supported = await Linking.canOpenURL(url);
+    const supported = await Linking.canOpenURL(url)
     if (supported) {
-      await Linking.openURL(url);
+      await Linking.openURL(url)
     } else {
-      console.log("Cannot open URL: " + url);
+      console.log('Cannot open URL: ' + url)
     }
-  };
+  }
 
-function SaveDocs(){
-  console.log(Documents)
-  DocumentsList.update((s) => {
-    s.documentsList = Documents;
-  });
-  navigation.navigate(ROUTES.ECSERVICE)
-}
- 
+  function SaveDocs() {
+    console.log(Documents)
+    DocumentsList.update((s) => {
+      s.documentsList = Documents
+    })
+    navigation.navigate(ROUTES.ECSERVICE)
+  }
+
   return (
     <>
-    { (loading === true || loading === 'true') ?
-      <>
-      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
-            <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
-            <Text style={{ fontSize: 24, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', fontWeight: 'bold', marginLeft: 10 }}>
-            {serviceName}
+      {loading === true || loading === 'true' ? (
+        <>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 20,
+              marginTop: 10
+            }}
+          >
+            <Ionicons
+              name="ios-arrow-back"
+              size={24}
+              onPress={() => navigation.goBack()}
+            />
+            <Text
+              style={{
+                fontSize: 24,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                fontWeight: 'bold',
+                marginLeft: 10
+              }}
+            >
+              {serviceName}
             </Text>
           </View>
-     <View style={styles.loaderContainer}>
-     
+          <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
           </View>
-          </>
-          :
-          <>
-          <ScrollView
-            style={styles.maincontainer}>
-            <View>
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center',justifyContent:'space-between',marginVertical:10 }}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
-                <Text style={{ fontSize: 24,  fontWeight: 'bold',marginLeft:10}}>
-                  Documents
-                </Text>
-                </View>
-                 <View >
-            <TouchableOpacity onPress={SaveDocs} style={{ backgroundColor: COLORS.primary, padding: 10, borderRadius: 10, paddingHorizontal: 20 }}>
-              <Text style={{ color: 'white' }}>
-                Done
-              </Text>
-            </TouchableOpacity>
-          </View>
-    
-    
-              </View>
-    
-    
-            </View>
-           
-
-
-
-            
-    
-            {
-              1 === 1 &&
-              <View style={styles.container}>
-                {
-                  Documents.map((data, index) => (
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} key={index}>
-                      <View >
-                        <Text> {data.name}</Text>
-    
-                      </View>
-                      <View >
-                        <Text>
-                          {data.uploadedDate.toDateString()}
-                        </Text>
-    
-                      </View>
-    
-                    </View>
-    
-                  ))
-                }
-    
-                {
-                  ExistingDocuments.map((data, index) => (
-                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`${API_URL}/${data}`)}>
-                      <Text>Document-{index + 1}
-                       
-                      </Text>
-                    </TouchableOpacity>
-                  ))
-                }
-    
-                
-                <TouchableOpacity onPress={handleDocPick} style={{ backgroundColor: COLORS.primary, padding: 10, borderRadius: 10, paddingHorizontal: 20,marginTop:10 }}>
-              <Text style={{ color: 'white',textAlign:'center' }}>
-                Select Files
-              </Text>
-            </TouchableOpacity>
-              </View>
-            }
-    
-            
-          </ScrollView>
-          
         </>
-    }
-    </>
-    
-  );
-};
+      ) : (
+        <>
+          <ScrollView style={styles.maincontainer}>
+            <View>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginVertical: 10
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons
+                    name="ios-arrow-back"
+                    size={24}
+                    onPress={() => navigation.goBack()}
+                  />
+                  <Text
+                    style={{ fontSize: 24, fontWeight: 'bold', marginLeft: 10 }}
+                  >
+                    Documents
+                  </Text>
+                </View>
+                <View>
+                  <TouchableOpacity
+                    onPress={SaveDocs}
+                    style={{
+                      backgroundColor: COLORS.primary,
+                      padding: 10,
+                      borderRadius: 10,
+                      paddingHorizontal: 20
+                    }}
+                  >
+                    <Text style={{ color: 'white' }}>Done</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
 
-export default Documents;
+            {1 === 1 && (
+              <View style={styles.container}>
+                {Documents.map((data, index) => (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                    key={index}
+                  >
+                    <View>
+                      <Text> {data.name}</Text>
+                    </View>
+                    <View>
+                      <Text>{data.uploadedDate.toDateString()}</Text>
+                    </View>
+                  </View>
+                ))}
+
+                {ExistingDocuments.map((data, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => handleLinkPress(`${API_URL}/${data}`)}
+                  >
+                    <Text>Document-{index + 1}</Text>
+                  </TouchableOpacity>
+                ))}
+
+                <TouchableOpacity
+                  onPress={handleDocPick}
+                  style={{
+                    backgroundColor: COLORS.primary,
+                    padding: 10,
+                    borderRadius: 10,
+                    paddingHorizontal: 20,
+                    marginTop: 10
+                  }}
+                >
+                  <Text style={{ color: 'white', textAlign: 'center' }}>
+                    Select Files
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </ScrollView>
+        </>
+      )}
+    </>
+  )
+}
+
+export default Documents
 
 const styles = StyleSheet.create({
   maincontainer: {
     marginBottom: 75,
     paddingHorizontal: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'white'
   },
   image: {
     width: 100,
-    height: 100,
-
+    height: 100
   },
   buttonNotActive: {
     backgroundColor: 'white',
@@ -231,16 +278,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   container: {
-    padding: 15,
+    padding: 15
   },
   tableHeader: {
-    backgroundColor: '#DCDCDC',
+    backgroundColor: '#DCDCDC'
   },
   photoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between', // Add space between images
-    padding: 5, // Add padding to create spacing
+    padding: 5 // Add padding to create spacing
   },
   photoContainer: {
     width: '50%', // Adjust the width to allocate space for three images
@@ -250,32 +297,32 @@ const styles = StyleSheet.create({
   },
   camera: {
     width: '100%',
-    height: 400,
+    height: 400
   },
   captureButton: {
     backgroundColor: 'blue',
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 10
   },
   captureButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'center'
   },
   photo: {
     flex: 1,
     borderRadius: 5,
     width: '100%', // Fix the width to 100%
-    height: '100%', // Fix the height to 100%
+    height: '100%' // Fix the height to 100%
   },
 
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)'
   },
   enlargedPhoto: {
     width: '80%',
@@ -292,12 +339,12 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: 'rgb(0, 0, 0)',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   closeButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   deleteButton: {
     position: 'absolute',
@@ -307,13 +354,13 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   videoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 5,
+    padding: 5
   },
   videoContainer: {
     width: '50%',
@@ -325,7 +372,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 5,
     width: '100%', // Fix the width to 100%
-    height: '100%', // Fix the height to 100%
+    height: '100%' // Fix the height to 100%
   },
   deleteButton: {
     position: 'absolute',
@@ -336,30 +383,26 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   enlargedVideoContainer: {
     flex: 1,
     backgroundColor: 'black',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   enlargedVideo: {
     width: '100%',
-    height: '100%',
-  },
-});
+    height: '100%'
+  }
+})
 
+// <DataTable.Header style={styles.tableHeader}>
+//         <DataTable.Title>Name</DataTable.Title>
+//         <DataTable.Title>Favourite Food</DataTable.Title>
+//         <DataTable.Title>Age</DataTable.Title>
+//       </DataTable.Header>
 
-
-                                                                            // <DataTable.Header style={styles.tableHeader}>
-                                                                            //         <DataTable.Title>Name</DataTable.Title>
-                                                                            //         <DataTable.Title>Favourite Food</DataTable.Title>
-                                                                            //         <DataTable.Title>Age</DataTable.Title>
-                                                                            //       </DataTable.Header>
-
-
-
-                                                                            // <TouchableOpacity onPress={()=>handlePress(data.uri)}>
-                                                                            //        <Text> {data.name} </Text>
-                                                                            //         </TouchableOpacity>
+// <TouchableOpacity onPress={()=>handlePress(data.uri)}>
+//        <Text> {data.name} </Text>
+//         </TouchableOpacity>
