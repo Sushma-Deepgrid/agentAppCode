@@ -9,7 +9,7 @@ import {
   TextInput
 } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
-import { Video } from 'expo-av'
+import Video from 'react-native-video';
 import Field from '../../components/Field'
 import React, { useState, useEffect, useRef } from 'react'
 import { COLORS, ROUTES } from '../../constants'
@@ -17,7 +17,6 @@ import { VictoryPie } from 'victory-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import EntypoIcon from 'react-native-vector-icons/Entypo'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import {
   PropertyId,
   ServiceName,
@@ -28,15 +27,16 @@ import {
   CommentBox,
   Reload
 } from '../../../store'
-import * as DocumentPicker from 'expo-document-picker'
+import DocumentPicker from 'react-native-document-picker'
 import axios from 'axios'
-import * as FileSystem from 'expo-file-system'
-import * as Location from 'expo-location'
-import { Camera } from 'expo-camera'
-import MapView, { Marker, Polygon } from 'react-native-maps'
+import RNFS from 'react-native-fs';
+import Geolocation from '@react-native-community/geolocation';
+import { RNCamera } from 'react-native-camera';
+import MapView, { Marker, PROVIDER_GOOGLE, Polygon } from 'react-native-maps'
 import { API_URL } from '@env'
 
 const ECService = ({ navigation }) => {
+  const mapRef = React.useRef(null);
   const { propertyId } = PropertyId.useState((s) => s)
   const { serviceName } = ServiceName.useState((s) => s)
   const { serviceId } = ServiceId.useState((s) => s)
@@ -61,7 +61,12 @@ const ECService = ({ navigation }) => {
   const [Photos1, setPhotos1] = useState([])
   const [Geotagging, setGeotagging] = useState([])
   const [PreviousGeotagging, setPreviousGeotagging] = useState([])
-  const [initialRegion, setInitialRegion] = useState(null)
+  const [initialRegion, setInitialRegion] = useState({
+    latitude:17.36165, 
+    longitude:78.47465,
+    latitudeDelta: 0.5,
+    longitudeDelta: 0.5
+  })
   const [MarkerPhotos, setMarkerPhotos] = useState([])
   const [ExistingPhotos, setExistingPhotos] = useState([])
   const [PreviousPhotos, setPreviousPhotos] = useState([])
@@ -71,6 +76,7 @@ const ECService = ({ navigation }) => {
   const [currentLocation, setCurrentLocation] = useState(null)
   const [loading, setLoading] = useState(false)
   const cameraRef = useRef(null)
+  
 
   function DocButtonPress() {
     setIsActiveDoc(!isActiveDoc)
@@ -158,7 +164,7 @@ const ECService = ({ navigation }) => {
         // console.warn(imagesObj);
         setExistingPhotos(imagesObj)
       } catch (error) {
-        await console.warn(error)
+         console.warn("warn167",error)
         // window.alert("Can't Assign Same Track Name")
       }
     }
@@ -183,27 +189,6 @@ const ECService = ({ navigation }) => {
     console.log(Documents)
   }
 
-  const handlePhotosPick = async () => {
-    let result = await DocumentPicker.getDocumentAsync({})
-    const uploadDate = new Date()
-
-    // alert(result.uri);
-    alert(`Uploaded ${result.name} Succesfully`)
-    const obj = [...Photos]
-
-    obj.push({
-      name: result.name,
-      uploadedDate: uploadDate, // Include the upload date in the document object
-      uri: result.uri
-    })
-    setPhotos(obj)
-
-    console.log(obj)
-    console.log(Photos)
-  }
-  const handlePress = (url) => {
-    Linking.openURL(url)
-  }
 
   const PhotoItem = ({ item, onPress, onDelete }) => {
     const [enlarged, setEnlarged] = useState(false)
@@ -225,8 +210,8 @@ const ECService = ({ navigation }) => {
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
         <Image source={{ uri: item.uri }} style={styles.photo} />
         <View>
-          <Text>Latitude:{item.lat}</Text>
-          <Text>Longitude:{item.long}</Text>
+          <Text style={{color:COLORS.black}}>Latitude:{item.lat}</Text>
+          <Text style={{color:COLORS.black}}>Longitude:{item.long}</Text>
         </View>
         {enlarged && (
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -263,8 +248,8 @@ const ECService = ({ navigation }) => {
           style={styles.photo}
         />
         <View>
-          <Text>Latitude:{item.lat}</Text>
-          <Text>Longitude:{item.long}</Text>
+          <Text style={{color:COLORS.black}}>Latitude:{item.lat}</Text>
+          <Text style={{color:COLORS.black}}>Longitude:{item.long}</Text>
         </View>
         {enlarged && (
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -313,24 +298,6 @@ const ECService = ({ navigation }) => {
     console.log(selectedPhoto2)
   }
 
-  const handleVideosPick = async () => {
-    let result = await DocumentPicker.getDocumentAsync({})
-    const uploadDate = new Date()
-
-    alert(`Uploaded ${result.name} Successfully`)
-
-    const obj = [...Videos]
-
-    obj.push({
-      name: result.name,
-      uploadedDate: uploadDate,
-      uri: result.uri
-    })
-
-    setVideos(obj)
-
-    console.log(obj)
-  }
 
   const VideoItem = ({ item, onPress, onDelete }) => {
     const handlePress = () => {
@@ -416,24 +383,75 @@ const ECService = ({ navigation }) => {
     formData.append('images', [])
 
     // Add documents to formData
+    // for (let i = 0; i < documentsList.length; i++) {
+    //   const documentUri = documentsList[i].uri
+    //   const documentName = documentUri.split('/').pop()
+    //   const documentType = documentsList[i].type // Modify the type if needed
+
+    //   const documentData = await RNFS.readFile(documentUri, 'base64');
+
+    //   formData.append('documents', {
+    //     uri: documentUri,
+    //     name: documentName,
+    //     type: documentType,
+    //     data: documentData
+    //   })
+    // }
+    const getMimeType = (filename) => {
+      console.log("filename",filename);
+      // Mapping of file extensions to MIME types
+      const mimeTypeMap = {
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
+        'pdf': 'application/pdf',
+        'doc': 'application/msword',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // MIME type for .xlsx
+        'csv': 'text/csv',
+        // Add more mappings as needed
+      };
+      console.log("mimeTypeMap",mimeTypeMap);
+    
+      // Extract the file extension
+      const extension = filename.split('.').pop().toLowerCase();
+    console.log("extension",extension);
+      // Return the corresponding MIME type or a default one
+      return mimeTypeMap[extension] || 'application/octet-stream';
+    };
+    
     for (let i = 0; i < documentsList.length; i++) {
-      const documentUri = documentsList[i].uri
-      const documentName = documentUri.split('/').pop()
-      const documentType = 'application/pdf' // Modify the type if needed
-
-      const documentData = await FileSystem.readAsStringAsync(documentUri, {
-        encoding: FileSystem.EncodingType.Base64
-      })
-
+      const documentUri = documentsList[i].uri;
+      const documentName = documentUri.split('/').pop();
+      const documentType = getMimeType(documentsList[i].name);
+      console.log("documentTypedocumentType",documentType);
+    
+      const documentData = await RNFS.readFile(documentUri, 'base64');
+    
       formData.append('documents', {
         uri: documentUri,
         name: documentName,
         type: documentType,
         data: documentData
-      })
+      });
     }
+    
 
     try {
+      console.log("formData&***************",formData);
+      const getFormDataContent = (formData) => {
+        const data = {};
+        for (const [key, value] of formData?._parts) {
+          data[key] = value;
+        }
+        return JSON.stringify(data, null, 2);
+      };
+      
+      // After you've appended all your data to formData
+      console.log('formData', getFormDataContent(formData));
+      console.log("reqqqs");
       const response = await axios.put(
         `${API_URL}/user/edit-task/${serviceId}`,
         formData,
@@ -456,7 +474,10 @@ const ECService = ({ navigation }) => {
 
       navigation.goBack()
     } catch (error) {
-      console.log(error)
+      console.log("error",error)
+      console.log("error",error.message)
+      console.log("error",error.data)
+      setLoading(false)
     }
 
     console.log(Videos)
@@ -466,19 +487,18 @@ const ECService = ({ navigation }) => {
   }
 
   useEffect(() => {
-    ;(async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync()
-      console.log(status)
-      if (status !== 'granted') {
-        // Handle permission denied
-        return
-      } else {
-        let { coords } = await Location.getCurrentPositionAsync({})
-
-        console.log(coords)
-      }
-    })()
-  }, [])
+    Geolocation.requestAuthorization();
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log(position.coords);
+      },
+      error => {
+        console.log(error.message);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+  }, []);
+  
 
   const handleStatusChange = (index) => {
     if (index !== 0) {
@@ -494,59 +514,6 @@ const ECService = ({ navigation }) => {
     } else {
       console.log('Cannot open URL: ' + url)
     }
-  }
-  const capturePhoto = async () => {
-    // Check camera permissions
-    const { status } = await Camera.requestCameraPermissionsAsync()
-    if (status !== 'granted') {
-      console.log('Camera permission not granted')
-      navigation.navigate(ROUTES.TASKS_DETAIL)
-      return
-    }
-
-    // Capture photo
-    const photo = await cameraRef.current.takePictureAsync({ quality: 1 })
-    console.log(photo)
-    setPhotos([...Photos, photo])
-    // Get current location
-    const { coords } = await Location.getCurrentPositionAsync({})
-    const { latitude, longitude } = coords
-
-    const obj = [...Geotagging]
-    // Create photo object with location
-    const photoWithLocation = {
-      lat: latitude,
-      long: longitude
-    }
-    setLoading(true)
-    obj.push(photoWithLocation)
-    console.log(obj)
-
-    const PhotosObj = [...Photos1]
-
-    const xobj = {
-      url: photo.uri,
-      lat: latitude,
-      long: longitude
-    }
-    console.log(xobj)
-    PhotosObj.push(xobj)
-    console.log(PhotosObj)
-    // Append photo to Photos array
-    setGeotagging(obj)
-
-    setPhotos1(PhotosObj)
-    setLoading(false)
-  }
-
-  const [cameraType, setCameraType] = useState(Camera.Constants.Type.back)
-
-  const handleCameraFlip = () => {
-    setCameraType(
-      cameraType === Camera.Constants.Type.back
-        ? Camera.Constants.Type.front
-        : Camera.Constants.Type.back
-    )
   }
 
   const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null)
@@ -596,7 +563,8 @@ const ECService = ({ navigation }) => {
             }}
           >
             <Ionicons
-              name="ios-arrow-back"
+              name="arrow-back"
+              color='black'
               size={24}
               onPress={() => navigation.goBack()}
             />
@@ -609,7 +577,8 @@ const ECService = ({ navigation }) => {
                 justifyContent: 'center',
                 width: '100%',
                 fontWeight: 'bold',
-                marginLeft: 10
+                marginLeft: 10,
+                color:COLORS.black
               }}
             >
               {serviceName}
@@ -635,11 +604,12 @@ const ECService = ({ navigation }) => {
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons
-                    name="ios-arrow-back"
+                    name="arrow-back"
+                    color='black' 
                     size={24}
                     onPress={() => navigation.goBack()}
                   />
-                  <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
+                  <Text style={{ fontSize: 24, fontWeight: 'bold', color:COLORS.black, marginLeft: 10  }}>
                     {serviceName}
                   </Text>
                 </View>
@@ -709,7 +679,7 @@ const ECService = ({ navigation }) => {
                 }}
               >
                 <Ionicons name="folder" size={80} color={COLORS.primary} />
-                <Text style={{ fontSize: 16, textAlign: 'center' }}>
+                <Text style={{ fontSize: 16, textAlign: 'center',color: COLORS.black }}>
                   Documents
                 </Text>
               </TouchableOpacity>
@@ -724,7 +694,7 @@ const ECService = ({ navigation }) => {
                   size={80}
                   color={COLORS.primary}
                 />
-                <Text style={{ fontSize: 16, textAlign: 'center' }}>
+                <Text style={{ fontSize: 16, textAlign: 'center',color: COLORS.black  }}>
                   Images
                 </Text>
               </TouchableOpacity>
@@ -745,141 +715,13 @@ const ECService = ({ navigation }) => {
                   paddingHorizontal: 10,
                   borderWidth: 2,
                   width: '100%',
-                  padding: 10
+                  padding: 10,
+                  color:COLORS.black
                 }}
                 placeholderTextColor="#808080"
               ></TextInput>
             </View>
-
-            {/* <FlatList
-                  data={Photos}
-                  numColumns={2}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item }) => (
-                    <PhotoItem item={item} onPress={handlePhotoPress} onDelete={handleDeletePhoto} />
-                  )}
-                  contentContainerStyle={styles.photoGrid}
-                /> */}
-
-            {/* <TouchableOpacity
-              onPress={DocButtonPress}
-              style={isActiveDoc ? styles.buttonActive : styles.buttonNotActive}>
-              <Text style={isActiveDoc ? styles.buttonActiveText : styles.buttonNotActiveText}>
-                Upload Documents
-              </Text>
-    
-            </TouchableOpacity>
-    
-            {
-              isActiveDoc &&
-              <View style={styles.container}>
-                {
-                  Documents.map((data, index) => (
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} key={index}>
-                      <View >
-                        <Text> {data.name}</Text>
-    
-                      </View>
-                      <View >
-                        <Text>
-                          {data.uploadedDate.toDateString()}
-                        </Text>
-    
-                      </View>
-    
-                    </View>
-    
-                  ))
-                }
-    
-                {
-                  ExistingDocuments.map((data, index) => (
-                    <TouchableOpacity key={index} onPress={() => handleLinkPress(`${API_URL}/${data}`)}>
-                      <Text>Document-{index + 1}
-                       
-                      </Text>
-                    </TouchableOpacity>
-                  ))
-                }
-    
-                <View style={{ marginTop: 10 }}>
-                  <Button title="Select Files" onPress={handleDocPick} />
-                </View>
-    
-              </View>
-            }
-    
-            <TouchableOpacity
-              onPress={PhotosButtonPress}
-              style={1 == 1 ? styles.buttonActive : styles.buttonNotActive}>
-              <Text style={1 === 1 ? styles.buttonActiveText : styles.buttonNotActiveText}>
-                Upload Images
-              </Text>
-    
-            </TouchableOpacity>
-            isActivePhotos
-            {
-              1 === 1 &&
-              <>
-               
-               
-    
-    
-                <FlatList
-                  data={ExistingPhotos}
-                  numColumns={2}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item }) => (
-                    <PhotoItem2 item={item} onPress={handlePhotoPress2} onDelete={handleDeletePhoto2} />
-                  )}
-                  contentContainerStyle={styles.photoGrid}
-                />
-                
-    
-                {selectedPhoto != null && (
-                  <Modal visible={true} transparent={true} onRequestClose={handleClosePhoto}>
-                    <View style={styles.modalContainer}>
-                      <Image source={{ uri: selectedPhoto.uri }} style={styles.enlargedPhoto} />
-                      <TouchableOpacity style={styles.closeButton} onPress={handleClosePhoto}>
-                        <Text style={styles.closeButtonText}>X</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Modal>
-                )}
-                {selectedPhoto2 != null && (
-                  <Modal visible={true} transparent={true} onRequestClose={handleClosePhoto2}>
-                    <View style={styles.modalContainer}>
-                      <Image source={{ uri: `${API_URL}/${selectedPhoto2}` }} style={styles.enlargedPhoto} />
-                      <TouchableOpacity style={styles.closeButton} onPress={handleClosePhoto2}>
-                        <Text style={styles.closeButtonText}>X</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Modal>
-                )}
-                <View style={{ position: 'relative' }}>
-                  <Camera style={styles.camera} type={cameraType} ref={cameraRef} />
-    
-    
-    
-                  <TouchableOpacity onPress={handleCameraFlip}>
-                    <MaterialIcons style={{ position: 'absolute', bottom: 2, right: 2 }} name="flip-camera-android" size={24} color="white" />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.captureButton} onPress={capturePhoto}>
-                    <Text style={styles.captureButtonText}>Capture Photo</Text>
-                  </TouchableOpacity>
-    
-    
-    
-    
-                </View>
-                <TouchableOpacity style={styles.captureButton} onPress={handlePhotosPick}>
-                  <Text style={styles.captureButtonText}>Select Files</Text>
-                </TouchableOpacity>
-              </>
-    
-            } */}
-
-            <MapView style={styles.map} initialRegion={initialRegion}>
+            <MapView style={styles.map} initialRegion={initialRegion} provider={PROVIDER_GOOGLE}>
               {PreviousGeotagging != null && (
                 <>
                   {PreviousGeotagging.map((marker, index) => (
@@ -912,8 +754,11 @@ const styles = StyleSheet.create({
     marginBottom: 75,
     flex: 1
   },
+  container: {
+   flex:1
+  },
   map: {
-    flex: 1
+    flex:1
   },
   image: {
     width: 100,

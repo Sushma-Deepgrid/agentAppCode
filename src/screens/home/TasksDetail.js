@@ -20,10 +20,11 @@ import {
   ServiceId,
   Reload
 } from '../../../store'
+import NoImage from '../../assets/nophotoavaliable.jpeg';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5'
 import { API_URL } from '@env';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+// import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios'
 
 const TasksDetails = ({ navigation }) => {
@@ -336,9 +337,10 @@ const TasksDetails = ({ navigation }) => {
           ]}
         >
           <Image
-            source={{ uri: propertyImage[currentIndex] }}
+            // source={{}}
+            source={ propertyImage.length != 0 ? { uri: propertyImage[currentIndex] } : NoImage }
             style={styles.image}
-            resizeMode="cover"
+            resizeMode="contain"
           />
         </Animated.View>
       </View>
@@ -394,8 +396,9 @@ const TasksDetails = ({ navigation }) => {
             }}
           >
             <Ionicons
-              name="ios-arrow-back"
+              name="arrow-back"
               size={24}
+              color='black'
               onPress={() => navigation.goBack()}
             />
             <Text
@@ -406,7 +409,8 @@ const TasksDetails = ({ navigation }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 'bold',
-                marginLeft: 10
+                marginLeft: 10,
+                color:COLORS.black
               }}
             >
               Property Details
@@ -425,8 +429,8 @@ const TasksDetails = ({ navigation }) => {
         </View>
 
         <View>
-          {propertyImage.length != 0 && <CustomImageSlider />}
-
+          {/* {propertyImage.length != 0 && <CustomImageSlider />} */}
+          <CustomImageSlider />
           {/* <Image   style={styles.propertyImg}
           source={{
             uri:`${propertyImage}`,
@@ -435,36 +439,36 @@ const TasksDetails = ({ navigation }) => {
         </View>
 
         <View style={{ ...styles.flexStyle, paddingTop: 10 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{propertyID}</Text>
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+          <Text style={{ fontSize: 20, fontWeight: 'bold',color:COLORS.black }}>{propertyID}</Text>
+          <Text style={{ fontSize: 18, fontWeight: 'bold',color:COLORS.black }}>
             {propertySize != '' && <Text> {propertySize} sq. yd </Text>}
           </Text>
         </View>
 
         <ScrollView>
-          <Text style={{ textAlign: 'justify', marginTop: 10 }}>
+          <Text style={{ textAlign: 'justify', marginTop: 10,color:COLORS.black }}>
             {propertyDes}
           </Text>
         </ScrollView>
 
-        <Text style={{ fontSize: 22, marginVertical: 10 }}>
+        <Text style={{ fontSize: 22, marginVertical: 10, color:COLORS.black }}>
           Contact Details
         </Text>
 
         <View style={{ width: '100%' }}>
-          <Text>
+          <Text style={{color:COLORS.black}}>
             {propertyAddress} , {propertyLocality} ,
           </Text>
-          <Text>
+          <Text style={{color:COLORS.black}}>
             {propertyMandal} , {propertyCity} ,
           </Text>
           <View style={{ flexDirection: 'row' }}>
-            <Text>{propertyState}</Text>
-            <Text>, {propertyPincode}</Text>
+            <Text style={{color:COLORS.black}}>{propertyState}</Text>
+            <Text style={{color:COLORS.black}}>, {propertyPincode}</Text>
           </View>
         </View>
 
-        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Services</Text>
+        <Text style={{ fontWeight: 'bold', fontSize: 20, color:COLORS.black }}>Services</Text>
         <View style={styles.container}>
           <View style={styles.stepsCard}>
             <Steps stepsDetail={stepsDetail} completedSteps={completedSteps} />
@@ -496,7 +500,7 @@ const TasksDetails = ({ navigation }) => {
               padding: 5
             }}
           >
-            <Text style={{ color: 'white' }}>Audio Call</Text>
+            <Text style={{ color: 'white',color:COLORS.black }}>Audio Call</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -509,7 +513,7 @@ const TasksDetails = ({ navigation }) => {
               padding: 5
             }}
           >
-            <Text style={{ color: 'white' }}>Video Call</Text>
+            <Text style={{ color: 'white',color:COLORS.black }}>Video Call</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -625,7 +629,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 4,
-    textAlign: 'left'
+    textAlign: 'left',
+    color:COLORS.black
   },
   stepDescription: {
     fontSize: 16,
@@ -644,5 +649,6 @@ const styles = StyleSheet.create({
   image: {
     width: Dimensions.get('window').width,
     height: 200
+    // height: Dimensions.get('window').height
   }
 })

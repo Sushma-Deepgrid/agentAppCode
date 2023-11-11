@@ -1,46 +1,4 @@
 {
-  "expo": {
-    "name": "Bhuvi Realtech",
-    "slug": "bhuvi-realtech",
-    "version": "1.0.1",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.sushmanaalla.ReactnativeApp"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.sushmanaalla.ReactnativeApp"
-    },
-    "web": {
-      "favicon": "./assets/logo2.png",
-      "backgroundColor": "#ffffff"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "a4ca2d2a-0af1-49b2-a20e-c6cecf03438b"
-      }
-    },
-    "plugins": [
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
-        }
-      ]
-    ]
-  }
+  "name": "bhuvirealtech",
+  "displayName": "BhuviRealtech"
 }

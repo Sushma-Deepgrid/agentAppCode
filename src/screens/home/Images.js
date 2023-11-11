@@ -1,15 +1,15 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView,ActivityIndicator, Button, Linking, Image, FlatList, Modal } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView,ActivityIndicator, Button, Linking, Image, FlatList, Modal, Alert } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, ROUTES } from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import * as FileSystem from 'expo-file-system';
+// import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import RNFS from 'react-native-fs';
 import { PropertyId, ServiceName, ServiceId, UserToken,Reload } from '../../../store';
-import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
-// import * as Location from 'expo-location';
-import { Camera } from 'expo-camera';
-import * as Permissions from 'expo-permissions';
+import Geolocation from '@react-native-community/geolocation';
+import { PermissionsAndroid, Platform } from 'react-native';
+import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import { RNCamera } from 'react-native-camera';
 import { API_URL } from '@env';
 
 const Images = ({ navigation }) => {
@@ -33,6 +33,7 @@ const Images = ({ navigation }) => {
 
 
   useEffect(() => {
+    console.log("imagess");
 
     async function fetchTrackApiData() {
 
@@ -46,28 +47,34 @@ const Images = ({ navigation }) => {
             }
           }
         );
-console.log( response.data.task.previous_images)
-setSelectedStatus(response.data.task.status)
-setComment(response.data.task.comments)
-if(!response.data.task.previous_geo_tagging && !response.data.task.previous_images){
-    setPreviousGeotag(response.data.task.previous_geo_tagging)
-    setPreviousPhotos(response.data.task.previous_images)
-  }
+        console.log( "response.data.task.previous_images",response.data.task.previous_images)
+        console.log( "response.data.task.previous_geo_tagging",response.data.task.previous_geo_tagging)
+        setSelectedStatus(response.data.task.status)
+        setComment(response.data.task.comments)
+        if(response.data.task.previous_geo_tagging?.length !== 0 && response.data.task.previous_geo_tagging !== null){
+            setPreviousGeotag(response.data.task.previous_geo_tagging)
+          }
+          if(response.data.task.previous_images?.length !== 0 && response.data.task.previous_images !== null){
+            setPreviousPhotos(response.data.task.previous_images)
+
+          }
 
         const imagesObj=[]
-        for(let i=0;i<response.data.task.previous_geo_tagging?.length;i++){
-            imagesObj.push({
+        console.log("imagesObj",imagesObj);
+        for(let i=0;i<response.data.task.previous_geo_tagging.length;i++){
+          imagesObj.push({
             "imageUrl":response.data.task.previous_images[i],
             "lat":response.data.task.previous_geo_tagging[i].lat,
             "long":response.data.task.previous_geo_tagging[i].long
-            })
+          })
         }
         // console.warn(imagesObj);
+        console.log("imagesObj1",imagesObj);
         setExistingPhotos(imagesObj);
         
        
       } catch (error) {
-        await console.warn(error);
+        console.warn("error",error);
         // window.alert("Can't Assign Same Track Name")
       }
     }
@@ -75,32 +82,12 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
   }, [1]);
 
 
-  const handlePhotosPick = async () => {
-
-    let result = await DocumentPicker.getDocumentAsync({});
-    const uploadDate = new Date();
-
-    // alert(result.uri);
-    alert(`Uploaded ${result.name} Succesfully`)
-    const obj = [...Photos]
-
-    obj.push({
-      name: result.name,
-      uploadedDate: uploadDate, // Include the upload date in the document object
-      uri: result.uri,
-    });
-    setPhotos(obj)
-
-    console.log(obj);
-    console.log(Photos);
-
-  }
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedPhoto2, setSelectedPhoto2] = useState(null);
 
   const handlePhotoPress = (photo) => {
     setSelectedPhoto(photo);
-    console.log(selectedPhoto)
+    console.log("selectedPhoto",selectedPhoto)
   };
   const handleDeletePhoto = (photo) => {
    
@@ -115,15 +102,15 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
   };
   const handleClosePhoto = () => {
     setSelectedPhoto(null);
-    console.log(selectedPhoto)
+    console.log("selectedPhoto",selectedPhoto)
   };
 
   const handlePhotoPress2 = (photo) => {
     setSelectedPhoto2(photo);
-    console.log(selectedPhoto2)
+    console.log("selectedPhoto2",selectedPhoto2)
   };
   const handleDeletePhoto2 = (photo) => {
-     console.log(ExistingPhotos)
+     console.log("ExistingPhotos",ExistingPhotos)
     for(let i=0;i<ExistingPhotos.length;i++){
       if(photo.imageUrl === ExistingPhotos[i].imageUrl){
         PreviousPhotos.splice(i,1)
@@ -135,13 +122,13 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
     setPreviousGeotag(PreviousGeotag)
 
     const updatedPhotos = ExistingPhotos.filter((item) => item !== photo);
-    console.log(updatedPhotos)
+    console.log("updatedPhotos",updatedPhotos)
     setExistingPhotos(updatedPhotos);
 
   };
   const handleClosePhoto2 = () => {
     setSelectedPhoto2(null);
-    console.log(selectedPhoto2)
+    console.log("selectedPhoto2",selectedPhoto2)
   };
 
 
@@ -166,9 +153,9 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
         <Image source={{ uri: item.url }} style={styles.photo} />
         <View>
-          <Text>
+          <Text style={{color:COLORS.black}}>
             Latitude:{item.lat}</Text>
-          <Text>Longitude:{item.long}</Text>
+          <Text style={{color:COLORS.black}}>Longitude:{item.long}</Text>
         </View>
         {enlarged && (
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -204,9 +191,9 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
         <Image source={{ uri: `${API_URL}/${item.imageUrl}` }} style={styles.photo} />
         <View>
-          <Text>
+          <Text style={{color:COLORS.black}}>
             Latitude:{item.lat}</Text>
-          <Text>Longitude:{item.long}</Text>
+          <Text style={{color:COLORS.black}}>Longitude:{item.long}</Text>
         </View>
         {enlarged && (
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -230,22 +217,16 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
 
 
   useEffect(() => {
-
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      console.log(status)
-      if (status !== 'granted') {
-        // Handle permission denied
-        return;
-      }
-      else {
-
-        let { coords } = await Location.getCurrentPositionAsync({});
-
-        console.log(coords)
-
-      }
-    })();
+    Geolocation.requestAuthorization();
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log("position.coords",position.coords);
+      },
+      error => {
+        console.log("Error getting location:", error.message);
+      },
+      { enableHighAccuracy: true }
+    );
   }, []);
 
   const [isCameraVisible, setIsCameraVisible] = useState(false);
@@ -274,9 +255,10 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
   //   navigation.navigate(ROUTES.TASKS_DETAIL);
   // };
   const openCamera = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
+    const status = await request(PERMISSIONS.ANDROID.CAMERA); 
+  
     if (status === 'granted') {
-      console.log('Camera permission not granted');
+      console.log('Camera permission granted');
       setIsCameraVisible(true);
     } else {
       console.log('Camera permission not granted');
@@ -286,65 +268,149 @@ if(!response.data.task.previous_geo_tagging && !response.data.task.previous_imag
   const closeCamera = () => {
     setIsCameraVisible(false);
   };
-  const capturePhoto = async () => {
+//   const capturePhoto = async () => {
+//     // Check camera permissions
+//     const { status } = await RNCamera.requestCameraPermissionsAsync();
+//     if (status !== 'granted') {
+//       console.log('Camera permission not granted');
+//       return;
+//     }
+//     setLoading(true);
+//     // Capture photo
+//     const photo = await cameraRef.current.takePicture({ quality: 1 });
+// console.log([...Photos, photo],"photosss")
+// setPhotos([...Photos, photo]);
+// setIsCameraVisible(false);
+//     // Get current location
+//     const { coords } = await Location.getCurrentPositionAsync({});
+//     const { latitude, longitude } = coords;
+ 
+//     const obj = [...Geotagging]
+//     // Create photo object with location
+//     const photoWithLocation = {
+//       lat: latitude,
+//       long: longitude,
+//     };
+    
+//     obj.push(photoWithLocation)
+//     console.log("obj",obj)
+
+//     const PhotosObj=[...Photos1]
+    
+//       const xobj={
+//         url:photo.uri,
+//         lat:latitude,
+//         long:longitude
+//        }
+//        console.log("xobj",xobj)
+//        PhotosObj.push(xobj)
+//     console.log("PhotosObj",PhotosObj)
+//     // Append photo to Photos array
+//     setGeotagging(obj)
+    
+//     setPhotos1(PhotosObj);
+//     setLoading(false);
+    
+//   };
+
+const capturePhoto = async () => {
+  try {
     // Check camera permissions
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
+    let cameraStatus;
+    if (Platform.OS === 'ios') {
+      cameraStatus = await check(PERMISSIONS.IOS.CAMERA);
+      if (cameraStatus !== RESULTS.GRANTED) {
+        cameraStatus = await request(PERMISSIONS.IOS.CAMERA);
+      }
+    } else {
+      cameraStatus = await check(PERMISSIONS.ANDROID.CAMERA);
+      if (cameraStatus !== RESULTS.GRANTED) {
+        cameraStatus = await request(PERMISSIONS.ANDROID.CAMERA);
+      }
+    }
+
+    if (cameraStatus !== RESULTS.GRANTED) {
       console.log('Camera permission not granted');
       return;
     }
+
     setLoading(true);
+
     // Capture photo
-    const photo = await cameraRef.current.takePictureAsync({ quality: 1 });
-console.log([...Photos, photo],"photosss")
-setPhotos([...Photos, photo]);
-setIsCameraVisible(false);
+    const photo = await cameraRef.current.takePictureAsync({ quality: 1, exif: true });
+
+    // Update Photos state
+    console.log([...Photos, photo], "photosss");
+    setPhotos([...Photos, photo]);
+    setIsCameraVisible(false);
+    setLoader(true)
+
     // Get current location
-    const { coords } = await Location.getCurrentPositionAsync({});
-    const { latitude, longitude } = coords;
- 
-    const obj = [...Geotagging]
-    // Create photo object with location
-    const photoWithLocation = {
-      lat: latitude,
-      long: longitude,
-    };
-    
-    obj.push(photoWithLocation)
-    console.log(obj)
+    let locationStatus;
+    if (Platform.OS === 'ios') {
+      locationStatus = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      if (locationStatus !== RESULTS.GRANTED) {
+        locationStatus = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      }
+    } else {
+      locationStatus = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      if (locationStatus !== RESULTS.GRANTED) {
+        locationStatus = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      }
+    }
 
-    const PhotosObj=[...Photos1]
-    
-      const xobj={
-        url:photo.uri,
-        lat:latitude,
-        long:longitude
-       }
-       console.log(xobj)
-       PhotosObj.push(xobj)
-    console.log(PhotosObj)
-    // Append photo to Photos array
-    setGeotagging(obj)
-    
-    setPhotos1(PhotosObj);
+    if (locationStatus === RESULTS.GRANTED) {
+      Geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+
+          // Update Geotagging state with the new location
+          const newGeoTag = { lat: latitude, long: longitude };
+          setGeotagging(prevGeoTagging => [...prevGeoTagging, newGeoTag]);
+
+          // Create a new photo object with URL and location
+          const newPhotoWithLocation = {
+            url: photo.uri,
+            lat: latitude,
+            long: longitude
+          };
+          setPhotos1(prevPhotos => [...prevPhotos, newPhotoWithLocation]);
+          setLoader(false)
+          console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+          
+        },
+        error => console.log(error),
+        setLoader(false),
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+      );
+    } else {
+      setLoader(false)
+      console.log('Location permission not granted');
+    }
+  } catch (error) {
+    setLoader(false)
+    console.error("Error capturing photo or getting location:", error);
+  } finally {
+    setLoader(false)
     setLoading(false);
-    
-  };
+  }
+};
 
-  const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
+
+  const [cameraType, setCameraType] = useState(RNCamera.Constants.Type.back);
 
   const handleCameraFlip = () => {
     setCameraType(
-      cameraType === Camera.Constants.Type.back
-        ? Camera.Constants.Type.front
-        : Camera.Constants.Type.back
+      cameraType === RNCamera.Constants.Type.back
+        ? RNCamera.Constants.Type.front
+        : RNCamera.Constants.Type.back
     );
   };
 
   async function SaveImages(e){
     e.preventDefault();
     setLoader(true)
-
+    try {
     // console.log("Documents:", documentsList);
     // console.log("selectedStatus:", selectedStatus);
 
@@ -363,21 +429,22 @@ setIsCameraVisible(false);
     formData.append("status", selectedStatus);
     formData.append("geo_fencing", []);
 
-    if(Geotagging.length === 0){
+    if(Geotagging?.length === 0 || Geotagging === null){
       formData.append("geo_tagging", []);
     }
     else{
       formData.append("geo_tagging", JSON.stringify(Geotagging));
     }
 
-    if(PreviousGeotag.length === 0){
+    if(PreviousGeotag?.length === 0 || PreviousGeotag === null){
       formData.append("previous_geo_tagging", []);
     }
     else{
       formData.append("previous_geo_tagging", JSON.stringify(PreviousGeotag));
     }
 
-    if(PreviousPhotos.length === 0){
+    console.log("PreviousPhotos fom",PreviousPhotos);
+    if(PreviousPhotos?.length === 0 || PreviousPhotos === null){
       formData.append("previous_images", []);
     }
     else{
@@ -391,9 +458,7 @@ setIsCameraVisible(false);
       const photoName = photoUri.split('/').pop();
       const photoType = 'image/jpeg'; // Modify the type if needed
     
-      const photoData = await FileSystem.readAsStringAsync(photoUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+      const photoData = await RNFS.readFile(photoUri, 'base64');
 
       formData.append("images", {
         uri: photoUri,
@@ -401,10 +466,25 @@ setIsCameraVisible(false);
         type: photoType,
         data: photoData,
       });
+    
     }
 
- 
-    try {
+    const getFormDataContent = (formData) => {
+      const data = {};
+      for (const [key, value] of formData?._parts) {
+        data[key] = value;
+      }
+      return JSON.stringify(data, null, 2);
+    };
+    
+    // After you've appended all your data to formData
+    console.log('formData', getFormDataContent(formData));
+    
+    
+    
+    
+      console.log("formData",formData);
+      console.log("formData.previous_images",formData?.previous_images);
       const response = await axios.put(
         `${API_URL}/user/edit-task/${serviceId}`,
         formData,
@@ -416,7 +496,7 @@ setIsCameraVisible(false);
         }
       );
 
-      console.log(response);
+      console.log("response 392",response);
     
      
       setLoader(false)
@@ -424,10 +504,13 @@ setIsCameraVisible(false);
     
     navigation.goBack();
     } catch (error) {
-      console.log(error);
+      setLoader(false)
+      console.log("error",error);
+      alert(error)
     }
 
   }
+  
 
 
   return (
@@ -436,8 +519,8 @@ setIsCameraVisible(false);
     { (loader === true || loader === 'true') ?
       <>
       <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
-            <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
-            <Text style={{ fontSize: 24, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', fontWeight: 'bold', marginLeft: 10 }}>
+            <Ionicons name="arrow-back" color='black' size={24} onPress={() => navigation.goBack()} />
+            <Text style={{ fontSize: 24, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', fontWeight: 'bold', marginLeft: 10,color:COLORS.black }}>
             {serviceName}
             </Text>
           </View>
@@ -451,10 +534,10 @@ setIsCameraVisible(false);
           <View
             style={styles.maincontainer}>
            <View>
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center',justifyContent:'space-between',marginVertical:10 }}>
+              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center',justifyContent:'space-between',marginVertical:10, marginLeft: 10  }}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
-                <Text style={{ fontSize: 24,  fontWeight: 'bold',marginLeft:10}}>
+                <Ionicons color='black' name="arrow-back" size={24} onPress={() => navigation.goBack()} />
+                <Text style={{ fontSize: 24,  fontWeight: 'bold',marginLeft:10, color:COLORS.black}}>
                   Images
                 </Text>
                 </View>
@@ -482,9 +565,9 @@ setIsCameraVisible(false);
    {isCameraVisible && (
    <Modal visible={true} transparent={true} onRequestClose={handleClosePhoto}>
    <View style={styles.CameramodalContainer}>
-   <Camera style={styles.camera} type={cameraType} ref={cameraRef} />
+   <RNCamera style={styles.camera} type={cameraType} ref={cameraRef} />
    <TouchableOpacity onPress={handleCameraFlip}>
-    <MaterialIcons style={{ position: 'absolute', bottom: 55, right: 15 }} name="flip-camera-android" size={24} color="white" />
+    {/* <MaterialIcons style={{ position: 'absolute', bottom: 55, right: 15 }} name="flip-camera-android" size={24} color="white" /> */}
   </TouchableOpacity>
   {
     loading ?
@@ -536,7 +619,7 @@ setIsCameraVisible(false);
                   contentContainerStyle={styles.photoGrid}
                 />
               </View>
-               
+              
     
     <View >
 
@@ -599,6 +682,7 @@ export default Images;
 const styles = StyleSheet.create({
   maincontainer: {
     flex: 1,
+    paddingHorizontal: 10,
   },
   image: {
     width: 100,

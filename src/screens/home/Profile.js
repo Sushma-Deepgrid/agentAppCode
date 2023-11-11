@@ -1,7 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, Alert, Modal, Pressable } from 'react-native';
 import { COLORS, ROUTES, IMGS } from '../../constants';
-import Field from '../../components/Field';
 import Button from '../../components/Button';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import { UserToken,UserFirstName,UserLastName,UserMobile,UserId} from '../../../store';
@@ -33,17 +32,17 @@ const Profile = () => {
         }
       );
   
-      await console.log(response.data.userProfile,"Profile Data",response.data.userProfile.current_town);
+      console.log(response.data.userProfile,"Profile Data",response.data.userProfile.current_town);
       onChangeNumber(response.data.userProfile.mobile)
       onChangeFirstName(response.data.userProfile.first_name)
       onChangeLastName(response.data.userProfile.last_name)
     } catch (error) {
-      await console.error(error);
+      console.error(error);
       // window.alert("Can't Assign Same Track Name")
     }
   }
   fetchServicesData();
-}, [1]);
+}, []);
 
 
   function UpdateProfileFunction() {
@@ -62,11 +61,11 @@ const Profile = () => {
           }}
         );
 
-       await  console.warn(response.data.userProfile);
+        console.warn(response.data.userProfile);
        onChangeNumber(response.data.userProfile.mobile)
         setUpdateModalVisible(true)
       } catch (error) {
-        await  console.warn(error);
+        console.warn(error);
         // window.alert("Can't Assign Same Track Name")
       }
     }
@@ -84,20 +83,16 @@ const Profile = () => {
 
       </View>
       <View style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', marginTop: 10 }}>
-        <Field value={number} onChangeText={onChangeNumber} placeholder="Mobile Number" keyboardType={'numeric'} />
+        <TextInput   style={styles.textInput} value={number} onChangeText={onChangeNumber} placeholder="Mobile Number" keyboardType={'numeric'} />
       </View>
 
       <View style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', marginTop: 15 }}>
-        <TextInput  style={{ borderRadius: 15,fontSize: 20,
-         borderColor: '#808080', paddingHorizontal: 10, 
-         borderWidth: 2, width:'80%', padding:10}}
+        <TextInput  style={styles.textInput}
       placeholderTextColor="black"   value={firstName}  placeholder="First Name" editable={false}  />
       </View>
 
       <View style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', marginTop: 15 }}>
-        <TextInput  style={{ borderRadius: 15,fontSize: 20,
-         borderColor: '#808080', paddingHorizontal: 10, 
-         borderWidth: 2, width:'80%', padding:10}}
+        <TextInput    style={styles.textInput}
       placeholderTextColor="black" editable={false}  value={lastName} placeholder="Last Name" />
       </View>
 
@@ -179,4 +174,14 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold'
   },
+  textInput: {
+    borderRadius: 15,
+    fontSize: 20,
+    borderColor: '#808080', 
+    paddingHorizontal: 10, 
+    borderWidth: 2, 
+    width:'80%', 
+    padding:10,
+    color:COLORS.black
+  }
 });

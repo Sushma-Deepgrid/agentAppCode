@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView,RefreshControl } from 'react-native';
 import React,{useEffect,useState} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
 import { COLORS,ROUTES } from '../../constants';
 import { VictoryPie } from "victory-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -20,28 +22,56 @@ const Home = ({navigation}) => {
   }, []);
   const { userToken } = UserToken.useState((s) => s);
   // console.log(userToken);
-  useEffect(() => {
-    async function fetchTrackApiData() {
-      // console.log(userToken)
+  // useEffect(() => {
+  //   async function fetchTrackApiData() {
+  //     // console.log(userToken)
+  //     try {
+  //       const response = await axios.get(
+  //         `${API_URL}/user/get-tasks`,
+  //         { headers: {
+  //           'Authorization': 'Bearer ' + userToken
+  //         }}
+  //       );
+
+  //       // await  console.log(response.data.tasks);
+  //       // console.warn(response.data.tasks);
+  //      settasksData(response.data.tasks)
+  //      settasksDataUsers(response.data.tasks)
+  //     } catch (error) {
+  //       await  console.warn(error);
+  //       // window.alert("Can't Assign Same Track Name")
+  //     }
+  //   }
+  //   fetchTrackApiData();
+  // }, [refreshing]);
+
+useFocusEffect(
+  React.useCallback(() => {
+    let isActive = true;
+    
+    const fetchTrackApiData = async () => {
       try {
         const response = await axios.get(
           `${API_URL}/user/get-tasks`,
-          { headers: {
-            'Authorization': 'Bearer ' + userToken
-          }}
+          { headers: { 'Authorization': 'Bearer ' + userToken }}
         );
-
-        // await  console.log(response.data.tasks);
-        // console.warn(response.data.tasks);
-       settasksData(response.data.tasks)
-       settasksDataUsers(response.data.tasks)
+        if (isActive) {
+          settasksData(response.data.tasks);
+          settasksDataUsers(response.data.tasks);
+        }
       } catch (error) {
-        await  console.warn(error);
-        // window.alert("Can't Assign Same Track Name")
+        console.warn(error);
       }
-    }
+    };
+
     fetchTrackApiData();
-  }, [refreshing]);
+
+    // Returned function will run when the component is unmounted or the screen loses focus
+    return () => {
+      isActive = false;
+    };
+  }, [userToken])
+);
 
   const [filteredtasksData, setFilteredtasksData] = useState([]);
   const [tasksDataUsers, settasksDataUsers]=useState([])
@@ -144,7 +174,7 @@ const handleStatusChange = (index) => {
        <View style={{ marginTop: 30 }}>
         <View style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10,justifyContent:'space-between' }}>
 
-        <Text style={{ fontSize: 20 }}>
+        <Text style={{ fontSize: 20, color:COLORS.black, }}>
           My Tasks
         </Text>
 
@@ -201,10 +231,10 @@ const handleStatusChange = (index) => {
                       </Text>
                     </View>
                     <View>
-                      <Text>
+                      <Text style={{color:COLORS.black}}>
                         {data.service_name}
                       </Text>
-                      <Text>
+                      <Text style={{color:COLORS.black}}>
                         {data.property.property_name}
                       </Text>
                     </View>
@@ -260,6 +290,7 @@ const styles = StyleSheet.create({
     marginBottom:70
   },
   heading: {
+    color:COLORS.black,
     textAlign: 'center',
     fontSize: 30
   }

@@ -17,6 +17,7 @@ import {
 } from 'react-native'
 import {useNavigation} from '@react-navigation/native';
 import {COLORS, ROUTES} from '../../constants';
+import { TextInput } from 'react-native-paper';
 const ForgotPassword = (props) => {
   const navigation = useNavigation();
   return (
@@ -31,7 +32,7 @@ const ForgotPassword = (props) => {
         </Text>
       </View>
           <View style={{width:'100%', marginBottom: 30,alignItems:'center' }}>
-          <Field  placeholder="Email" keyboardType={'email-address'}/>
+          <TextInput mode = 'outlined' style={styles.textInput}  placeholder="Email" keyboardType={'email-address'}/>
           </View>
           
         <Button textColor="white" bgColor="#34447d" btnLabel="Reset Password" />
@@ -63,5 +64,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent:'center'
   },
+  textInput : {
+    backgroundColor:"white",
+    width:"90%",
+  }
 });
 export default ForgotPassword;

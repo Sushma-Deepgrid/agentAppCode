@@ -11,7 +11,7 @@ const Settings = ({navigation}) => {
         alignItems: 'center',
         backgroundColor: COLORS.bgColor,
       }}>
-      <Text>Settings Detail</Text>
+      <Text style={{color:COLORS.black}}>Settings Detail</Text>
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.button}

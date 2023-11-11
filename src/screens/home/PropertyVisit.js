@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Button, Linking, Image, FlatList, Modal  } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
-import { Video } from 'expo-av';
+import Video from 'react-native-video';
 import React, { useState } from 'react';
 import { COLORS, ROUTES } from '../../constants';
 import { VictoryPie } from "victory-native";
@@ -9,7 +9,7 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PropertyId } from '../../../store';
 import { DataTable } from 'react-native-paper';
-import * as DocumentPicker from 'expo-document-picker';
+import DocumentPicker from 'react-native-document-picker';
 import { Geofencing } from '../../../store';
 const PropertyVisit = ({ navigation }) => {
   const { propertyId } = PropertyId.useState((s) => s);
@@ -54,47 +54,43 @@ const Status = ["Completed", "Pending", "In Progress"]
   }
 
 
-  const handleDocPick = async () => {
+  const handleFilePick = async (setter, currentFiles) => {
+    try {
+        const result = await DocumentPicker.pick({
+            type: [DocumentPicker.types.allFiles],
+        });
 
-    let result = await DocumentPicker.getDocumentAsync({});
-    const uploadDate = new Date();
+        const uploadDate = new Date();
 
-    // alert(result.uri);
-    alert(`Uploaded ${result.name} Succesfully`)
-    const obj = [...Documents]
+        alert(`Uploaded ${result.name} Successfully`);
 
-    obj.push({
-      name: result.name,
-      uploadedDate: uploadDate, // Include the upload date in the document object
-      uri: result.uri,
-    });
-    setDocuments(obj)
+        const obj = [...currentFiles];
+        obj.push({
+            name: result.name,
+            uploadedDate: uploadDate,
+            uri: result.uri,
+        });
+        setter(obj);
 
-    console.log(obj);
-    console.log(Documents);
+        console.log(obj);
+        console.log(currentFiles);
+    } catch (err) {
+        if (DocumentPicker.isCancel(err)) {
+            console.log('User cancelled the picker');
+        } else {
+            throw err;
+        }
+    }
+};
 
-  }
+const handleDocPick = () => {
+  handleFilePick(setDocuments, Documents);
+};
 
-  const handlePhotosPick = async () => {
+const handlePhotosPick = () => {
+  handleFilePick(setPhotos, Photos);
+};
 
-    let result = await DocumentPicker.getDocumentAsync({});
-    const uploadDate = new Date();
-
-    // alert(result.uri);
-    alert(`Uploaded ${result.name} Succesfully`)
-    const obj = [...Photos]
-
-    obj.push({
-      name: result.name,
-      uploadedDate: uploadDate, // Include the upload date in the document object
-      uri: result.uri,
-    });
-    setPhotos(obj)
-
-    console.log(obj);
-    console.log(Photos);
-
-  }
   const handlePress = (url) => {
     Linking.openURL(url);
   };
@@ -147,24 +143,10 @@ const Status = ["Completed", "Pending", "In Progress"]
   };
 
 
-const handleVideosPick = async () => {
-  let result = await DocumentPicker.getDocumentAsync({});
-  const uploadDate = new Date();
-
-  alert(`Uploaded ${result.name} Successfully`);
-
-  const obj = [...Videos];
-
-  obj.push({
-    name: result.name,
-    uploadedDate: uploadDate,
-    uri: result.uri,
-  });
-
-  setVideos(obj);
-
-  console.log(obj);
+  const handleVideosPick = () => {
+    handleFilePick(setVideos, Videos);
 };
+
 
 
 const VideoItem = ({ item, onPress, onDelete }) => {
@@ -229,7 +211,7 @@ function savePropertyDetails(){
       style={styles.maincontainer}>
 <View>
       <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: 10 }}>
-        <Ionicons name="ios-arrow-back" size={24} onPress={() => navigation.goBack()} />
+        <Ionicons name="arrow-back" color='black' size={24} onPress={() => navigation.goBack()} />
         <Text style={{ fontSize: 24, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', fontWeight: 'bold', marginLeft: 10 }}>
           Property Visit
         </Text>

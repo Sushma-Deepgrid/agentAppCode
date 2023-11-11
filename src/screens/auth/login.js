@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import Field from '../../components/Field'
-import Button from '../../components/Button'
+import React, {useState} from 'react';
+import Field from '../../components/Field';
+import Button from '../../components/Button';
 import {
   View,
   Text,
@@ -9,74 +9,81 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
-  Image
-} from 'react-native'
-import { COLORS, ROUTES, IMGS } from '../../constants'
+  Image,
+} from 'react-native';
+import {ROUTES, IMGS} from '../../constants';
 import {
   AuthStore,
   UserToken,
   UserId,
   UserFirstName,
   UserLastName,
-  UserMobile
-} from '../../../store'
-import axios from 'axios'
-import { API_URL } from '@env'
+  UserMobile,
+} from '../../../store';
+import axios from 'axios';
+import {API_URL} from '@env';
+import {TextInput} from 'react-native-paper';
+import Icon from "react-native-vector-icons/FontAwesome"
 
-const Login = ({ navigation }) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [selectedRole, setSelectedRole] = useState({ name: 'Agent', value: 4 })
+const Login = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [selectedRole, setSelectedRole] = useState({name: 'Agent', value: 4});
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
 
   function LoginFunction() {
-    console.log(email, password)
+    console.log(email, password);
 
     if (email !== '' && password !== '') {
-      console.log('API_URL', API_URL)
+      console.log('API_URL', API_URL);
       axios
         .post(`${API_URL}/auth/customer-login`, {
           email: email,
           password: password,
-          user_type_category_id: selectedRole.value
+          user_type_category_id: selectedRole.value,
         })
-        .then((response) => {
-          console.log(response.data, 'login')
+        .then(response => {
+          console.log(response.data, 'login');
 
-          UserToken.update((s) => ({ ...s, userToken: response.data.token }))
+          UserToken.update(s => ({...s, userToken: response.data.token}));
 
-          UserId.update((s) => ({ ...s, userId: response.data.user_id }))
+          UserId.update(s => ({...s, userId: response.data.user_id}));
 
-          UserFirstName.update((s) => ({
+          UserFirstName.update(s => ({
             ...s,
-            userFirstName: response.data.first_name
-          }))
+            userFirstName: response.data.first_name,
+          }));
 
-          UserLastName.update((s) => ({
+          UserLastName.update(s => ({
             ...s,
-            userLastName: response.data.last_name
-          }))
+            userLastName: response.data.last_name,
+          }));
 
-          UserMobile.update((s) => ({ ...s, userMobile: response.data.mobile }))
+          UserMobile.update(s => ({...s, userMobile: response.data.mobile}));
 
-          console.log(response.data.user_type_id)
+          console.log(response.data.user_type_id);
 
           if (
             response.data.user_type_id === 3 ||
             response.data.user_type_id === 2
           ) {
-            alert('Incorrect Email or Password')
+            alert('Incorrect Email or Password');
           } else {
-            navigation.navigate(ROUTES.HOME)
+            navigation.navigate(ROUTES.HOME);
 
-            AuthStore.update((s) => ({ ...s, isLoggedIn: true }))
+            AuthStore.update(s => ({...s, isLoggedIn: true}));
           }
         })
-        .catch((error) => {
-          console.log(error)
-          alert('Incorrect Email or Password')
-        })
+        .catch(error => {
+          console.log(error);
+          alert('Incorrect Email or Password');
+        });
     } else {
-      alert('Please enter both Email and Password')
+      alert('Please enter both Email and Password');
     }
   }
 
@@ -85,41 +92,50 @@ const Login = ({ navigation }) => {
       <View style={styles.container}>
         <View>
           <Image
-            style={{ width: 256, height: 128, marginBottom: 20 }}
+            style={{width: 256, height: 128, marginBottom: 20}}
             source={IMGS.LOGOLOGIN}
             resizeMode="contain"
           />
         </View>
-        <View style={{ width: '100%', marginBottom: 30, alignItems: 'center' }}>
-          <Field
+        <View style={{width: '100%', marginBottom: 30, alignItems: 'center'}}>
+          <TextInput
             value={email}
+            mode="outlined"
+            style={styles.textInput}
             onChangeText={setEmail}
             placeholder="Email or Mobile Number"
             keyboardType="email-address"
           />
         </View>
-        <View style={{ width: '100%', alignItems: 'center' }}>
-          <Field
+        <View style={{width: '100%', alignItems: 'center'}}>
+          <TextInput
+            mode="outlined"
             value={password}
+            style={styles.textInput}
             onChangeText={setPassword}
             placeholder="Password"
-            secureTextEntry={true}
+            secureTextEntry={!isPasswordVisible} // toggle based on state
           />
+          <TouchableOpacity onPress={togglePasswordVisibility} style={{position:'absolute',right:50,zIndex:0,top:15}} >
+
+              <Icon
+                name={isPasswordVisible ? 'eye' : 'eye-slash'}
+                color="black"
+                size={24}
+                />
+                </TouchableOpacity>
         </View>
+
         <View
           style={{
             alignItems: 'flex-end',
             width: '80%',
             paddingRight: 16,
-            marginBottom: 30
-          }}
-        >
+            marginBottom: 30,
+          }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
-          >
-            <Text
-              style={{ color: '#808080', fontSize: 16, fontWeight: 'bold' }}
-            >
+            onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}>
+            <Text style={{color: '#808080', fontSize: 16, fontWeight: 'bold'}}>
               Forgot Password ?
             </Text>
           </TouchableOpacity>
@@ -141,20 +157,24 @@ const Login = ({ navigation }) => {
         */}
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     backgroundColor: 'white',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
-  }
-})
+    justifyContent: 'center',
+  },
+  textInput: {
+    backgroundColor: 'white',
+    width: '80%',
+  },
+});
 
-export default Login
+export default Login;

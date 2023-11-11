@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from 'react-native-vector-icons';
 
 const Field = ({ secureTextEntry, onChangeText, ...props }) => {
   const [isVisible, setIsVisible] = useState(!secureTextEntry);
-
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
 
+  console.log("...props ",...props );
   return (
     <View style={styles.container}>
       <TextInput
@@ -19,10 +19,12 @@ const Field = ({ secureTextEntry, onChangeText, ...props }) => {
         placeholderTextColor="#808080"
       />
       {secureTextEntry && (
-        <TouchableOpacity onPress={toggleVisibility} style={styles.icon}>
-          <Ionicons name={isVisible ? 'eye' : 'eye-off'} size={24} color="#808080" />
-        </TouchableOpacity>
-      )}
+    <TouchableOpacity onPress={toggleVisibility} style={styles.icon}>
+      <Ionicons name={isVisible ? 'eye' : 'eye-off'} size={24} color="#808080" />
+    </TouchableOpacity>
+   
+)}
+
     </View>
   );
 };
