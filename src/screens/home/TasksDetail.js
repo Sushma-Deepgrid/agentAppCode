@@ -354,6 +354,9 @@ const TasksDetails = ({ navigation }) => {
     }
     const zoomLevel = 21;
     const url = `https://www.google.com/maps/search/?api=1&query=${propertyLat},${propertyLong}&z=${zoomLevel}`;
+    // const url = `https://www.google.com/maps/@${propertyLat},${propertyLong},${zoomLevel}z`;
+    // const url = `https://www.google.com/maps/search/?api=1&query=${propertyLat},${propertyLong}`;
+
 
 
     console.log('Attempting to open URL:', url);

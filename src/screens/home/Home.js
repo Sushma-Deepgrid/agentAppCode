@@ -12,7 +12,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import { API_URL } from '@env';
 
 const Home = ({navigation}) => {
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(true);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -72,6 +72,10 @@ useFocusEffect(
     };
   }, [userToken])
 );
+
+useEffect(()=>{
+  console.log("setRefreshing",setRefreshing);
+},[])
 
   const [filteredtasksData, setFilteredtasksData] = useState([]);
   const [tasksDataUsers, settasksDataUsers]=useState([])

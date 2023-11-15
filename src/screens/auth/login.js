@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {ROUTES, IMGS} from '../../constants';
+import {ROUTES, IMGS, COLORS} from '../../constants';
 import {
   AuthStore,
   UserToken,
@@ -23,13 +23,15 @@ import {
 import axios from 'axios';
 import {API_URL} from '@env';
 import {TextInput} from 'react-native-paper';
-import Icon from "react-native-vector-icons/FontAwesome"
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {ActivityIndicator} from 'react-native';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState({name: 'Agent', value: 4});
+  const [isLoading, setIsLoading] = useState(false);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -37,6 +39,7 @@ const Login = ({navigation}) => {
 
   function LoginFunction() {
     console.log(email, password);
+    setIsLoading(true);
 
     if (email !== '' && password !== '') {
       console.log('API_URL', API_URL);
@@ -66,6 +69,7 @@ const Login = ({navigation}) => {
           UserMobile.update(s => ({...s, userMobile: response.data.mobile}));
 
           console.log(response.data.user_type_id);
+          setIsLoading(false);
 
           if (
             response.data.user_type_id === 3 ||
@@ -79,10 +83,12 @@ const Login = ({navigation}) => {
           }
         })
         .catch(error => {
+          setIsLoading(false);
           console.log(error);
           alert('Incorrect Email or Password');
         });
     } else {
+      setIsLoading(false);
       alert('Please enter both Email and Password');
     }
   }
@@ -97,34 +103,42 @@ const Login = ({navigation}) => {
             resizeMode="contain"
           />
         </View>
-        <View style={{width: '100%', marginBottom: 30, alignItems: 'center'}}>
-          <TextInput
-            value={email}
-            mode="outlined"
-            style={styles.textInput}
-            onChangeText={setEmail}
-            placeholder="Email or Mobile Number"
-            keyboardType="email-address"
-          />
-        </View>
-        <View style={{width: '100%', alignItems: 'center'}}>
-          <TextInput
-            mode="outlined"
-            value={password}
-            style={styles.textInput}
-            onChangeText={setPassword}
-            placeholder="Password"
-            secureTextEntry={!isPasswordVisible} // toggle based on state
-          />
-          <TouchableOpacity onPress={togglePasswordVisibility} style={{position:'absolute',right:50,zIndex:0,top:15}} >
-
-              <Icon
-                name={isPasswordVisible ? 'eye' : 'eye-slash'}
-                color="black"
-                size={24}
+        {isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        ) : (
+          <>
+            <View
+              style={{width: '100%', marginBottom: 30, alignItems: 'center'}}>
+              <TextInput
+                value={email}
+                mode="outlined"
+                style={styles.textInput}
+                onChangeText={setEmail}
+                placeholder="Email or Mobile Number"
+                keyboardType="email-address"
+              />
+            </View>
+            <View style={{width: '100%', alignItems: 'center'}}>
+              <TextInput
+                mode="outlined"
+                value={password}
+                style={styles.textInput}
+                onChangeText={setPassword}
+                placeholder="Password"
+                secureTextEntry={!isPasswordVisible} // toggle based on state
+              />
+              <TouchableOpacity
+                onPress={togglePasswordVisibility}
+                style={{position: 'absolute', right: 50, zIndex: 0, top: 15}}>
+                <Icon
+                  name={isPasswordVisible ? 'eye' : 'eye-slash'}
+                  color="black"
+                  size={24}
                 />
-                </TouchableOpacity>
-        </View>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
 
         <View
           style={{
@@ -143,7 +157,7 @@ const Login = ({navigation}) => {
         <Button
           textColor="white"
           bgColor="#34447d"
-          btnLabel="Login"
+          btnLabel={isLoading ? 'Loading...' : 'Login'}
           Press={LoginFunction}
         />
 

@@ -265,6 +265,7 @@ const Tasks = ({navigation}) => {
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
             numColumns={gridView ? 2 : 1}
+            style={{marginBottom:100}}
           />
         ) : (
           <Text style={{color: COLORS.black}}>No Properties found</Text>

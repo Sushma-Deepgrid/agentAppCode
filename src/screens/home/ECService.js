@@ -9,7 +9,7 @@ import {
   TextInput
 } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
-import Video from 'react-native-video';
+import Video from 'react-native-video'
 import Field from '../../components/Field'
 import React, { useState, useEffect, useRef } from 'react'
 import { COLORS, ROUTES } from '../../constants'
@@ -29,14 +29,14 @@ import {
 } from '../../../store'
 import DocumentPicker from 'react-native-document-picker'
 import axios from 'axios'
-import RNFS from 'react-native-fs';
-import Geolocation from '@react-native-community/geolocation';
-import { RNCamera } from 'react-native-camera';
+import RNFS from 'react-native-fs'
+import Geolocation from '@react-native-community/geolocation'
+import { RNCamera } from 'react-native-camera'
 import MapView, { Marker, PROVIDER_GOOGLE, Polygon } from 'react-native-maps'
 import { API_URL } from '@env'
 
 const ECService = ({ navigation }) => {
-  const mapRef = React.useRef(null);
+  const mapRef = useRef(null)
   const { propertyId } = PropertyId.useState((s) => s)
   const { serviceName } = ServiceName.useState((s) => s)
   const { serviceId } = ServiceId.useState((s) => s)
@@ -62,8 +62,8 @@ const ECService = ({ navigation }) => {
   const [Geotagging, setGeotagging] = useState([])
   const [PreviousGeotagging, setPreviousGeotagging] = useState([])
   const [initialRegion, setInitialRegion] = useState({
-    latitude:17.36165, 
-    longitude:78.47465,
+    latitude: 17.36165,
+    longitude: 78.47465,
     latitudeDelta: 0.5,
     longitudeDelta: 0.5
   })
@@ -76,7 +76,6 @@ const ECService = ({ navigation }) => {
   const [currentLocation, setCurrentLocation] = useState(null)
   const [loading, setLoading] = useState(false)
   const cameraRef = useRef(null)
-  
 
   function DocButtonPress() {
     setIsActiveDoc(!isActiveDoc)
@@ -164,12 +163,37 @@ const ECService = ({ navigation }) => {
         // console.warn(imagesObj);
         setExistingPhotos(imagesObj)
       } catch (error) {
-         console.warn("warn167",error)
+        console.warn('warn167', error)
         // window.alert("Can't Assign Same Track Name")
       }
+      // fitAllMarkers()
     }
     fetchTrackApiData()
   }, [1])
+
+  
+useEffect(() => {
+  if (PreviousGeotagging && PreviousGeotagging.length > 0) {
+    fitAllMarkers();
+  }
+}, [PreviousGeotagging]); // Call fitAllMarkers when PreviousGeotagging changes
+
+const fitAllMarkers = () => {
+  if (mapRef.current && PreviousGeotagging && PreviousGeotagging.length > 0) {
+    mapRef.current.fitToCoordinates(
+      PreviousGeotagging.map((marker) => ({
+        latitude: marker.lat,
+        longitude: marker.long,
+      })),
+      {
+        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+        animated: true,
+      }
+    );
+  }
+};
+
+
   const handleDocPick = async () => {
     let result = await DocumentPicker.getDocumentAsync({})
     const uploadDate = new Date()
@@ -188,7 +212,6 @@ const ECService = ({ navigation }) => {
     console.log(obj)
     console.log(Documents)
   }
-
 
   const PhotoItem = ({ item, onPress, onDelete }) => {
     const [enlarged, setEnlarged] = useState(false)
@@ -210,8 +233,8 @@ const ECService = ({ navigation }) => {
       <TouchableOpacity style={styles.photoContainer} onPress={handlePress}>
         <Image source={{ uri: item.uri }} style={styles.photo} />
         <View>
-          <Text style={{color:COLORS.black}}>Latitude:{item.lat}</Text>
-          <Text style={{color:COLORS.black}}>Longitude:{item.long}</Text>
+          <Text style={{ color: COLORS.black }}>Latitude:{item.lat}</Text>
+          <Text style={{ color: COLORS.black }}>Longitude:{item.long}</Text>
         </View>
         {enlarged && (
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -248,8 +271,8 @@ const ECService = ({ navigation }) => {
           style={styles.photo}
         />
         <View>
-          <Text style={{color:COLORS.black}}>Latitude:{item.lat}</Text>
-          <Text style={{color:COLORS.black}}>Longitude:{item.long}</Text>
+          <Text style={{ color: COLORS.black }}>Latitude:{item.lat}</Text>
+          <Text style={{ color: COLORS.black }}>Longitude:{item.long}</Text>
         </View>
         {enlarged && (
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -297,7 +320,6 @@ const ECService = ({ navigation }) => {
     setSelectedPhoto2(null)
     console.log(selectedPhoto2)
   }
-
 
   const VideoItem = ({ item, onPress, onDelete }) => {
     const handlePress = () => {
@@ -398,60 +420,59 @@ const ECService = ({ navigation }) => {
     //   })
     // }
     const getMimeType = (filename) => {
-      console.log("filename",filename);
+      console.log('filename', filename)
       // Mapping of file extensions to MIME types
       const mimeTypeMap = {
-        'jpg': 'image/jpeg',
-        'jpeg': 'image/jpeg',
-        'png': 'image/png',
-        'gif': 'image/gif',
-        'bmp': 'image/bmp',
-        'pdf': 'application/pdf',
-        'doc': 'application/msword',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // MIME type for .xlsx
-        'csv': 'text/csv',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        gif: 'image/gif',
+        bmp: 'image/bmp',
+        pdf: 'application/pdf',
+        doc: 'application/msword',
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // MIME type for .xlsx
+        csv: 'text/csv'
         // Add more mappings as needed
-      };
-      console.log("mimeTypeMap",mimeTypeMap);
-    
+      }
+      console.log('mimeTypeMap', mimeTypeMap)
+
       // Extract the file extension
-      const extension = filename.split('.').pop().toLowerCase();
-    console.log("extension",extension);
+      const extension = filename.split('.').pop().toLowerCase()
+      console.log('extension', extension)
       // Return the corresponding MIME type or a default one
-      return mimeTypeMap[extension] || 'application/octet-stream';
-    };
-    
+      return mimeTypeMap[extension] || 'application/octet-stream'
+    }
+
     for (let i = 0; i < documentsList.length; i++) {
-      const documentUri = documentsList[i].uri;
-      const documentName = documentUri.split('/').pop();
-      const documentType = getMimeType(documentsList[i].name);
-      console.log("documentTypedocumentType",documentType);
-    
-      const documentData = await RNFS.readFile(documentUri, 'base64');
-    
+      const documentUri = documentsList[i].uri
+      const documentName = documentUri.split('/').pop()
+      const documentType = getMimeType(documentsList[i].name)
+      console.log('documentTypedocumentType', documentType)
+
+      const documentData = await RNFS.readFile(documentUri, 'base64')
+
       formData.append('documents', {
         uri: documentUri,
         name: documentName,
         type: documentType,
         data: documentData
-      });
+      })
     }
-    
 
     try {
-      console.log("formData&***************",formData);
+      console.log('formData&***************', formData)
       const getFormDataContent = (formData) => {
-        const data = {};
+        const data = {}
         for (const [key, value] of formData?._parts) {
-          data[key] = value;
+          data[key] = value
         }
-        return JSON.stringify(data, null, 2);
-      };
-      
+        return JSON.stringify(data, null, 2)
+      }
+
       // After you've appended all your data to formData
-      console.log('formData', getFormDataContent(formData));
-      console.log("reqqqs");
+      console.log('formData', getFormDataContent(formData))
+      console.log('reqqqs')
       const response = await axios.put(
         `${API_URL}/user/edit-task/${serviceId}`,
         formData,
@@ -474,9 +495,9 @@ const ECService = ({ navigation }) => {
 
       navigation.goBack()
     } catch (error) {
-      console.log("error",error)
-      console.log("error",error.message)
-      console.log("error",error.data)
+      console.log('error', error)
+      console.log('error', error.message)
+      console.log('error', error.data)
       setLoading(false)
     }
 
@@ -487,18 +508,17 @@ const ECService = ({ navigation }) => {
   }
 
   useEffect(() => {
-    Geolocation.requestAuthorization();
+    Geolocation.requestAuthorization()
     Geolocation.getCurrentPosition(
-      position => {
-        console.log(position.coords);
+      (position) => {
+        console.log(position.coords)
       },
-      error => {
-        console.log(error.message);
+      (error) => {
+        console.log(error.message)
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
-  }, []);
-  
+    )
+  }, [])
 
   const handleStatusChange = (index) => {
     if (index !== 0) {
@@ -564,7 +584,7 @@ const ECService = ({ navigation }) => {
           >
             <Ionicons
               name="arrow-back"
-              color='black'
+              color="black"
               size={24}
               onPress={() => navigation.goBack()}
             />
@@ -578,7 +598,7 @@ const ECService = ({ navigation }) => {
                 width: '100%',
                 fontWeight: 'bold',
                 marginLeft: 10,
-                color:COLORS.black
+                color: COLORS.black
               }}
             >
               {serviceName}
@@ -605,11 +625,18 @@ const ECService = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons
                     name="arrow-back"
-                    color='black' 
+                    color="black"
                     size={24}
                     onPress={() => navigation.goBack()}
                   />
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color:COLORS.black, marginLeft: 10  }}>
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 'bold',
+                      color: COLORS.black,
+                      marginLeft: 10
+                    }}
+                  >
                     {serviceName}
                   </Text>
                 </View>
@@ -679,7 +706,13 @@ const ECService = ({ navigation }) => {
                 }}
               >
                 <Ionicons name="folder" size={80} color={COLORS.primary} />
-                <Text style={{ fontSize: 16, textAlign: 'center',color: COLORS.black }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    textAlign: 'center',
+                    color: COLORS.black
+                  }}
+                >
                   Documents
                 </Text>
               </TouchableOpacity>
@@ -694,7 +727,13 @@ const ECService = ({ navigation }) => {
                   size={80}
                   color={COLORS.primary}
                 />
-                <Text style={{ fontSize: 16, textAlign: 'center',color: COLORS.black  }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    textAlign: 'center',
+                    color: COLORS.black
+                  }}
+                >
                   Images
                 </Text>
               </TouchableOpacity>
@@ -716,12 +755,18 @@ const ECService = ({ navigation }) => {
                   borderWidth: 2,
                   width: '100%',
                   padding: 10,
-                  color:COLORS.black
+                  color: COLORS.black
                 }}
                 placeholderTextColor="#808080"
               ></TextInput>
             </View>
-            <MapView style={styles.map} initialRegion={initialRegion} provider={PROVIDER_GOOGLE}>
+            <MapView
+              ref={mapRef}
+              style={styles.map}
+              initialRegion={initialRegion}
+              provider={PROVIDER_GOOGLE}
+              onMapReady={fitAllMarkers}
+            >
               {PreviousGeotagging != null && (
                 <>
                   {PreviousGeotagging.map((marker, index) => (
@@ -755,10 +800,10 @@ const styles = StyleSheet.create({
     flex: 1
   },
   container: {
-   flex:1
+    flex: 1
   },
   map: {
-    flex:1
+    flex: 1
   },
   image: {
     width: 100,
