@@ -12,7 +12,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import { API_URL } from '@env';
 
 const Home = ({navigation}) => {
-  const [refreshing, setRefreshing] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
