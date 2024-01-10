@@ -20,12 +20,14 @@ import {
   ServiceId,
   Reload
 } from '../../../store'
-import NoImage from '../../assets/nophotoavaliable.jpeg';
+import NoImage from '../../assets/nophotoavaliable.jpeg'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5'
-import { API_URL } from '@env';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { API_URL } from '@env'
 // import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios'
+import { Button } from 'react-native-paper'
 
 const TasksDetails = ({ navigation }) => {
   const { width } = Dimensions.get('window')
@@ -70,14 +72,11 @@ const TasksDetails = ({ navigation }) => {
     async function fetchTrackApiData() {
       // console.warn(`Bearer ${userToken}`)
       try {
-        const response = await axios.get(
-          `${API_URL}/user/get-tasks`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + userToken
-            }
+        const response = await axios.get(`${API_URL}/user/get-tasks`, {
+          headers: {
+            Authorization: 'Bearer ' + userToken
           }
-        )
+        })
 
         await console.log(response.data.tasks, 'tasks')
         const propertyObj = []
@@ -86,7 +85,7 @@ const TasksDetails = ({ navigation }) => {
             propertyObj.push(response.data.tasks[i])
           }
         }
-        // console.warn(propertyObj[0].property)
+        console.log('propertyObj', propertyObj)
 
         const serviceObj = []
         for (let j = 0; j < propertyObj.length; j++) {
@@ -143,6 +142,7 @@ const TasksDetails = ({ navigation }) => {
         setpropertyLat(finalobj.property.lat)
         setpropertyLong(finalobj.property.long)
 
+        console.log('finalobj.property.lat', finalobj)
         console.log('finalobj.property.lat', finalobj.property.lat)
         console.log('finalobj.property.long', finalobj.property.long)
 
@@ -199,6 +199,8 @@ const TasksDetails = ({ navigation }) => {
   }
 
   const Steps = ({ stepsDetail, completedSteps }) => {
+    console.log('stepsDetail', stepsDetail)
+    console.log('completedSteps', completedSteps)
     return (
       <View style={styles.stepList}>
         {stepsDetail.map((step, index) => {
@@ -274,19 +276,39 @@ const TasksDetails = ({ navigation }) => {
             }}
           >
             <Text style={styles.stepTitle}>{title}</Text>
-            {status === 'Completed' && (
-              <Text style={{ color: 'green', fontWeight: 'bold' }}>
-                Completed
-              </Text>
-            )}
-            {status === 'Ongoing' && (
-              <Text style={{ color: 'orange', fontWeight: 'bold' }}>
-                Ongoing
-              </Text>
-            )}
-            {status === 'Pending' && (
-              <Text style={{ color: 'red', fontWeight: 'bold' }}>Pending</Text>
-            )}
+            <>
+              {status === 'Completed' && (
+                <Text style={{ color: 'green', fontWeight: 'bold' }}>
+                  Completed
+                </Text>
+              )}
+              {status === 'Ongoing' && (
+                <Text style={{ color: 'orange', fontWeight: 'bold' }}>
+                  Ongoing
+                </Text>
+              )}
+              {status === 'Pending' && (
+                <Text style={{ color: 'red', fontWeight: 'bold' }}>
+                  Pending
+                </Text>
+              )}
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate(ROUTES.VIDEOCALL, {
+                    task_id: id,
+                    userToken
+                  })
+                }}
+                style={{
+                  marginBottom: 10,
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 15,
+                  padding: 5
+                }}
+              >
+                <Ionicons name="videocam" size={16} color="white" />
+              </TouchableOpacity>
+            </>
           </View>
         </TouchableOpacity>
       </ScrollView>
@@ -338,7 +360,11 @@ const TasksDetails = ({ navigation }) => {
         >
           <Image
             // source={{}}
-            source={ propertyImage.length != 0 ? { uri: propertyImage[currentIndex] } : NoImage }
+            source={
+              propertyImage.length != 0
+                ? { uri: propertyImage[currentIndex] }
+                : NoImage
+            }
             style={styles.image}
             resizeMode="contain"
           />
@@ -349,29 +375,26 @@ const TasksDetails = ({ navigation }) => {
 
   const handleLink1Press = () => {
     if (!propertyLat || !propertyLong) {
-      console.log("Latitude or Longitude is not set.");
-      return;
+      console.log('Latitude or Longitude is not set.')
+      return
     }
-    const zoomLevel = 21;
-    const url = `https://www.google.com/maps/search/?api=1&query=${propertyLat},${propertyLong}&z=${zoomLevel}`;
+    const zoomLevel = 21
+    const url = `https://www.google.com/maps/search/?api=1&query=${propertyLat},${propertyLong}&z=${zoomLevel}`
     // const url = `https://www.google.com/maps/@${propertyLat},${propertyLong},${zoomLevel}z`;
     // const url = `https://www.google.com/maps/search/?api=1&query=${propertyLat},${propertyLong}`;
 
+    console.log('Attempting to open URL:', url)
 
-
-    console.log('Attempting to open URL:', url);
-    
     Linking.canOpenURL(url)
       .then((supported) => {
         if (supported) {
-          return Linking.openURL(url);
+          return Linking.openURL(url)
         } else {
-          console.log("Cannot open Google Maps");
+          console.log('Cannot open Google Maps')
         }
       })
-      .catch((error) => console.log('Error occurred:', error));
+      .catch((error) => console.log('Error occurred:', error))
   }
-  
 
   return (
     <>
@@ -401,7 +424,7 @@ const TasksDetails = ({ navigation }) => {
             <Ionicons
               name="arrow-back"
               size={24}
-              color='black'
+              color="black"
               onPress={() => navigation.goBack()}
             />
             <Text
@@ -413,7 +436,7 @@ const TasksDetails = ({ navigation }) => {
                 justifyContent: 'center',
                 fontWeight: 'bold',
                 marginLeft: 10,
-                color:COLORS.black
+                color: COLORS.black
               }}
             >
               Property Details
@@ -442,36 +465,46 @@ const TasksDetails = ({ navigation }) => {
         </View>
 
         <View style={{ ...styles.flexStyle, paddingTop: 10 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold',color:COLORS.black }}>{propertyID}</Text>
-          <Text style={{ fontSize: 18, fontWeight: 'bold',color:COLORS.black }}>
+          <Text
+            style={{ fontSize: 20, fontWeight: 'bold', color: COLORS.black }}
+          >
+            {propertyID}
+          </Text>
+          <Text
+            style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.black }}
+          >
             {propertySize != '' && <Text> {propertySize} sq. yd </Text>}
           </Text>
         </View>
 
         <ScrollView>
-          <Text style={{ textAlign: 'justify', marginTop: 10,color:COLORS.black }}>
+          <Text
+            style={{ textAlign: 'justify', marginTop: 10, color: COLORS.black }}
+          >
             {propertyDes}
           </Text>
         </ScrollView>
 
-        <Text style={{ fontSize: 22, marginVertical: 10, color:COLORS.black }}>
+        <Text style={{ fontSize: 22, marginVertical: 10, color: COLORS.black }}>
           Contact Details
         </Text>
 
         <View style={{ width: '100%' }}>
-          <Text style={{color:COLORS.black}}>
+          <Text style={{ color: COLORS.black }}>
             {propertyAddress} , {propertyLocality} ,
           </Text>
-          <Text style={{color:COLORS.black}}>
+          <Text style={{ color: COLORS.black }}>
             {propertyMandal} , {propertyCity} ,
           </Text>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{color:COLORS.black}}>{propertyState}</Text>
-            <Text style={{color:COLORS.black}}>, {propertyPincode}</Text>
+            <Text style={{ color: COLORS.black }}>{propertyState}</Text>
+            <Text style={{ color: COLORS.black }}>, {propertyPincode}</Text>
           </View>
         </View>
 
-        <Text style={{ fontWeight: 'bold', fontSize: 20, color:COLORS.black }}>Services</Text>
+        <Text style={{ fontWeight: 'bold', fontSize: 20, color: COLORS.black }}>
+          Services1
+        </Text>
         <View style={styles.container}>
           <View style={styles.stepsCard}>
             <Steps stepsDetail={stepsDetail} completedSteps={completedSteps} />
@@ -482,7 +515,7 @@ const TasksDetails = ({ navigation }) => {
       </View> */}
         </View>
       </ScrollView>
-      {opencall && (
+      {/* {opencall && (
         <View
           style={{
             alignItems: 'center',
@@ -503,7 +536,9 @@ const TasksDetails = ({ navigation }) => {
               padding: 5
             }}
           >
-            <Text style={{ color: 'white',color:COLORS.black }}>Audio Call</Text>
+            <Text style={{ color: 'white', color: COLORS.white }}>
+              Audio Call
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -516,11 +551,13 @@ const TasksDetails = ({ navigation }) => {
               padding: 5
             }}
           >
-            <Text style={{ color: 'white',color:COLORS.black }}>Video Call</Text>
+            <Text style={{ color: 'white', color: COLORS.white }}>
+              Video Call
+            </Text>
           </TouchableOpacity>
         </View>
       )}
-      {/* <TouchableOpacity
+      <TouchableOpacity
         style={{
           borderWidth: 1,
           borderColor: 'rgba(0,0,0,0.2)',
@@ -533,12 +570,13 @@ const TasksDetails = ({ navigation }) => {
           height: 70,
           backgroundColor: COLORS.primary,
           borderRadius: 100,
-          zIndex: 5,
+          zIndex: 5
         }}
-        onPress={() => { 
-      setopencall(!opencall) }}
+        onPress={() => {
+          setopencall(!opencall)
+        }}
       >
-        <Ionicons name='ios-call-outline' size={30} color='white' />
+        <Ionicons name="call-outline" size={30} color="white" />
       </TouchableOpacity> */}
       {/* <TouchableOpacity
         style={{
@@ -633,7 +671,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 4,
     textAlign: 'left',
-    color:COLORS.black
+    color: COLORS.black
   },
   stepDescription: {
     fontSize: 16,

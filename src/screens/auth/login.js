@@ -137,8 +137,7 @@ const Login = ({navigation}) => {
                 />
               </TouchableOpacity>
             </View>
-          </>
-        )}
+        
 
         <View
           style={{
@@ -154,6 +153,8 @@ const Login = ({navigation}) => {
             </Text>
           </TouchableOpacity>
         </View>
+        </>
+        )}
         <Button
           textColor="white"
           bgColor="#34447d"

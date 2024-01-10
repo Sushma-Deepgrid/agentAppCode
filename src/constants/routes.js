@@ -29,5 +29,7 @@ export default {
   ECSERVICE:'EC Service',
   IMAGES:'Images',
   DOCUMENTS:'Documents',
-  ENTERLOCATION:'Enter Location'
+  ENTERLOCATION:'Enter Location',
+
+  VIDEOCALL: 'Video Call'
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Home, TasksDetail,PropertyVisit, GeoFencing,ECService,Images,Documents,EnterLocation} from '../screens';
 import {ROUTES} from '../constants';
+import VideoCall from '../screens/VideoCall';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,7 @@ function TasksNavigator() {
       <Stack.Screen name={ROUTES.TASKS_DETAIL} component={TasksDetail} />
        <Stack.Screen name={ROUTES.PROPERTYVISIT} component={PropertyVisit} />
         <Stack.Screen name={ROUTES.ECSERVICE} component={ECService} />
+        <Stack.Screen name={ROUTES.VIDEOCALL} component={VideoCall} />
        <Stack.Screen name={ROUTES.GEOFENCING} component={GeoFencing} />
        <Stack.Screen name={ROUTES.IMAGES} component={Images} />
        <Stack.Screen name={ROUTES.DOCUMENTS} component={Documents} />

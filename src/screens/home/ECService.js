@@ -137,8 +137,8 @@ const ECService = ({ navigation }) => {
         setPreviousPhotos(response.data.task.previous_images)
 
         if (response.data.task.previous_geo_tagging != null) {
-          const latitude = response.data.task.previous_geo_tagging[0].lat
-          const longitude = response.data.task.previous_geo_tagging[0].long
+          const latitude = response.data.task?.previous_geo_tagging[0]?.lat
+          const longitude = response.data.task?.previous_geo_tagging[0]?.long
 
           setInitialRegion({
             latitude,
