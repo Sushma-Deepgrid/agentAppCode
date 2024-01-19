@@ -74,7 +74,7 @@ useFocusEffect(
 );
 
 useEffect(()=>{
-  console.log("setRefreshing",setRefreshing);
+  console.log("setRefreshing",setRefreshing());
 },[])
 
   const [filteredtasksData, setFilteredtasksData] = useState([]);

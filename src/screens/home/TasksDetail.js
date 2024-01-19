@@ -292,6 +292,14 @@ const TasksDetails = ({ navigation }) => {
                   Pending
                 </Text>
               )}
+            </>
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'row'
+              }}
+            >
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate(ROUTES.VIDEOCALL, {
@@ -300,7 +308,7 @@ const TasksDetails = ({ navigation }) => {
                   })
                 }}
                 style={{
-                  marginBottom: 10,
+                  marginRight: 3,
                   backgroundColor: COLORS.primary,
                   borderRadius: 15,
                   padding: 5
@@ -308,7 +316,23 @@ const TasksDetails = ({ navigation }) => {
               >
                 <Ionicons name="videocam" size={16} color="white" />
               </TouchableOpacity>
-            </>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate(ROUTES.CHAT, {
+                    task_id: id,
+                    userToken
+                  })
+                }}
+                style={{
+                  // marginBottom: 10,
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 15,
+                  padding: 5
+                }}
+              >
+                <Ionicons name="chatbubbles" size={16} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableOpacity>
       </ScrollView>

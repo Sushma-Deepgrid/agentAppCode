@@ -31,5 +31,6 @@ export default {
   DOCUMENTS:'Documents',
   ENTERLOCATION:'Enter Location',
 
-  VIDEOCALL: 'Video Call'
+  VIDEOCALL: 'Video Call',
+  CHAT: 'Chat'
 };
