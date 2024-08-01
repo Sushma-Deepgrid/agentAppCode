@@ -33,6 +33,8 @@ const Login = ({navigation}) => {
   const [selectedRole, setSelectedRole] = useState({name: 'Agent', value: 4});
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log("API_URL",API_URL);
+
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
